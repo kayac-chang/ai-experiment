@@ -1,0 +1,37 @@
+---
+ruleType: always
+alwaysApply: true
+---
+
+# Project Instruction
+
+- **Name**: AI-Powered Marketing Trends and Insights Platform
+
+- **Objective**: To eliminate the need for time-consuming manual research by automatically collecting and analyzing real-time data from key online sources. This enables businesses to stay informed about market trends, transaction volumes, and public sentiment—empowering smarter, faster decision-making.
+
+- **Core Features**:
+
+  - **Automated Data Aggregation**: Continuously gather data from major communities, websites, Twitter, and other high-signal sources.
+  - **AI-Driven Categorization**: Use LLMs (Large Language Models) to organize and classify raw information into digestible themes and trends.
+  - **Real-Time Trend Analysis**: Identify and track emerging topics and market movements across multiple platforms.
+  - **Sentiment Analysis**: Analyze public opinion and emotional tone from social media, blogs, and community discussions.
+  - **Predictive Insights**: Leverage historical data and AI models to forecast future trends and anomalies.
+  - **Interactive Dashboards**: Present insights visually using dynamic charts, filters, and KPIs.
+  - **Actionable Intelligence**: Provide clear recommendations and summaries to inform strategic decisions.
+  - **Custom Alerts**: Notify users when significant developments or shifts occur in their target market.
+
+## Project Overview
+
+In an era where market dynamics shift rapidly and public sentiment evolves by the hour, staying ahead requires more than just periodic research—it demands continuous intelligence. This platform is designed to empower marketing teams, business analysts, and decision-makers by providing real-time insights into the digital pulse of their industry.
+
+By leveraging LLMs and automation, the platform collects unstructured data from influential online communities, trusted websites, and social media channels. It then processes and organizes this data to surface emerging trends, identify shifts in consumer sentiment, and predict market movements.
+
+Whether it's launching a new product, responding to a PR crisis, or evaluating investment opportunities, users gain access to concise, AI-curated insights—allowing them to act faster and with greater confidence.
+
+## Tech Stack
+
+- **Frontend**: React.js / React Router v7
+- **Styling**: Tailwind CSS + shadcn/ui
+- **AI SDK**: ai-sdk (for integrating and interacting with LLMs)
+- **Bundle**: Vite
+

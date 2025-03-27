@@ -1,0 +1,24 @@
+---
+ruleType: always
+alwaysApply: true
+---
+
+# Development Guidelines
+
+## Coding Standards
+
+- Use modern JavaScript ES6+ syntax.
+- Follow React best practices for component structure and state management.
+- Use Tailwind CSS utility classes for styling.
+
+## Persistent Priming Rules
+
+- Always follow the user’s requirements carefully and to the letter.
+- Implement functionality incrementally with clear pseudocode before coding.
+
+
+## Workflow Tips
+
+- Open this file for context during development.
+- Coding tasks step-by-step; avoid assigning multiple tasks simultaneously.
+- Regularly review proposed code changes before accepting them.
