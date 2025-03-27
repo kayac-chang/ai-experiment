@@ -1,5 +1,6 @@
 ---
-ruleType: always
+description: 
+globs: 
 alwaysApply: true
 ---
 
@@ -30,8 +31,23 @@ Whether it's launching a new product, responding to a PR crisis, or evaluating i
 
 ## Tech Stack
 
-- **Frontend**: React.js / React Router v7
-- **Styling**: Tailwind CSS + shadcn/ui
-- **AI SDK**: ai-sdk (for integrating and interacting with LLMs)
-- **Bundle**: Vite
+- **Framework**: React Router v7 with File-System Routes
+- **Language**: TypeScript
+- **Styling**: 
+  - Tailwind CSS
+  - shadcn/ui components
+  - Radix UI primitives
+- **AI Integration**: 
+  - Vercel AI SDK
+  - OpenAI integration
+- **Development Tools**:
+  - Vite
+  - Prettier with Tailwind plugin
+  - TypeScript
+- **Data Validation**:
+  - Zod for runtime type checking
+- **UI Components**:
+  - Lucide React icons
+  - Custom components with shadcn/ui
+  - Auto-resizing textarea
 

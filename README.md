@@ -1,87 +1,92 @@
-# Welcome to React Router!
+# AI Chatbot
 
-A modern, production-ready template for building full-stack React applications using React Router.
+A modern AI chatbot application built with React Router v7 and the Vercel AI SDK.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+## Tech Stack
+
+- **Framework**: React Router v7 with File-System Routes
+- **Language**: TypeScript
+- **Styling**:
+  - Tailwind CSS
+  - shadcn/ui components
+  - Radix UI primitives
+- **AI Integration**:
+  - Vercel AI SDK
+  - OpenAI integration
+- **Development Tools**:
+  - Vite
+  - Prettier with Tailwind plugin
+  - TypeScript
+- **Data Validation**:
+  - Zod for runtime type checking
+- **UI Components**:
+  - Lucide React icons
+  - Custom components with shadcn/ui
+  - Auto-resizing textarea
 
 ## Features
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+- Modern file-system based routing
+- Real-time AI chat interface
+- Responsive design
+- Dark mode support
+- Type-safe development
+- Code formatting with Prettier
+- Runtime type validation with Zod
+- Automatic code formatting on commit
 
 ## Getting Started
 
-### Installation
-
-Install the dependencies:
+1. Install dependencies:
 
 ```bash
 npm install
 ```
 
-### Development
+2. Set up environment variables:
 
-Start the development server with HMR:
+```bash
+cp .env.example .env
+```
+
+Then edit `.env` and add your OpenAI API key.
+
+3. Start the development server:
 
 ```bash
 npm run dev
 ```
 
-Your application will be available at `http://localhost:5173`.
-
-## Building for Production
-
-Create a production build:
+4. Build for production:
 
 ```bash
 npm run build
 ```
 
-## Deployment
+## Environment Variables
 
-### Docker Deployment
+Required variable:
 
-To build and run using Docker:
+- `OPENAI_API_KEY`: Your OpenAI API key
 
-```bash
-docker build -t my-app .
+## Development
 
-# Run the container
-docker run -p 3000:3000 my-app
-```
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run format` - Format code with Prettier
+- `npm run format:check` - Check code formatting
+- `npm run typecheck` - Run TypeScript type checking
 
-The containerized application can be deployed to any platform that supports Docker, including:
+### Git Hooks
 
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
+This project uses husky and lint-staged to automatically format code before commits. The following files will be automatically formatted:
 
-### DIY Deployment
+- JavaScript/TypeScript files (_.js, _.jsx, _.ts, _.tsx)
+- CSS files (\*.css)
+- Markdown files (\*.md)
 
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
+No additional setup is required - the hooks will run automatically when you commit changes.
 
-Make sure to deploy the output of `npm run build`
+## License
 
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
----
-
-Built with ❤️ using React Router.
+MIT
