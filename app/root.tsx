@@ -5,12 +5,10 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData,
-  type Cookie,
 } from 'react-router';
 
 import type { Route } from './+types/root';
-import './app.css';
+import './styles/app.css';
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
