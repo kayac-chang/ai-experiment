@@ -10,7 +10,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky",
-    "lingui:extract": "lingui extract"
+    "lingui:extract": "lingui extract",
+    "example": "tsx internal/run-example.ts",
+    "eval": "evalite"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,css,md}": [
@@ -34,6 +36,7 @@
     "ai": "^4.2.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dedent": "^1.5.3",
     "eventsource": "^3.0.6",
     "isbot": "^5.1.17",
     "lucide-react": "^0.484.0",
@@ -55,15 +58,24 @@
     "@types/node": "^20",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.1",
+    "autoevals": "^0.0.125",
+    "evalite": "^0.9.1",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.0",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "react-router-devtools": "^1.1.0",
     "tailwindcss": "^4.0.0",
+    "toml": "^3.0.0",
+    "tsx": "^4.19.3",
     "typescript": "^5.7.2",
     "vite": "^5.4.11",
     "vite-plugin-babel-macros": "^1.0.6",
-    "vite-tsconfig-paths": "^5.1.4"
-  }
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.0.9"
+  },
+  "volta": {
+    "node": "22.14.0"
+  },
+  "packageManager": "pnpm@9.3.0+sha1.d4f1da7af76dbdb4ab1a08f6b5add602ffad6fd4"
 }

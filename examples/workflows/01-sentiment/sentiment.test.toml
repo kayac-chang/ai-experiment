@@ -1,0 +1,101 @@
+# Sentiment Analysis Test Cases
+
+[[tests]]
+input = """
+Long term i think binance is solid.but short term the fud and overall view of market makes me think it drops alot lower...will be leaving stink bids in around 25-30 area for $BNB just incase..may not get but crypto being crypto, nothing is impossible
+"""
+expected = "neutral"
+
+[[tests]]
+input = """
+Despite all sorts of FUD, @binance
+ remains a top choice for crypto traders and investors. They're still attracting over a billion dollars in inflow every week.
+
+Reason: I believe the product is much superior; they've built a crypto super app that is not easy to replace.
+"""
+expected = "positive"
+
+[[tests]]
+input = """
+Long term i think binance is solid.but short term the fud and overall view of market makes me think it drops alot lower...will be leaving stink bids in around 25-30 area for $BNB just incase..may not get but crypto being crypto, nothing is impossible
+"""
+expected = "neutral"
+
+[[tests]]
+input = """
+I'll never touch Binance. They are cancerous to crypto. They centralised Bitcoin mining and then keep dumping Solana, buying kols to move meme coin casino to bnb chain. Just awful tactics
+"""
+expected = "negative"
+
+[[tests]]
+input = """
+Stop talking nonsense! Everyone trusts #Binance , and they have an impeccable reputation. They say they don't even make any profit from it, doing everything at their own expense. It's charity!
+"""
+expected = "negative"
+
+[[tests]]
+input = """
+The issue is that people think Binance is actually an exchange, it's not. It's a wealth extraction operation from its clients to its benefit and its VIP "market makers".  They have no interest is being an actual transparent exchange for their "clients" (sheep to slaughter).
+"""
+expected = "negative"
+
+[[tests]]
+input = """
+There's not NEARLY enough Binance FUD.
+
+It's a shady offshore exchange that trades useless unregistered securities, with users that almost all know "crypto" trading is just greater-fool gambling.
+
+There's no long-term case for Binance to exist.
+
+Even less for $BNB.
+"""
+expected = "negative"
+
+[[tests]]
+input = """
+We would have had a fantastic Bullrun if @binance
+ would have shut down for good and @cz_binance
+ kept for a couple of years!
+
+The manipulation is simply on a next level, they manipulate BTC, $SOL, $JASMY and did it to $FTM / $S as well.
+
+Binance is no more an Exchange, this is a criminal organization @_RichardTeng
+ !
+
+Hope @realDonaldTrump
+ @DavidSacks
+ and @AGPamBondi
+ will look into it!
+"""
+expected = "negative"
+
+[[tests]]
+input = """
+Binance is trash, I hardly ever use it, ill be closing my account with them and never looking back.
+
+Trash platform, founders, leadership, incredibly whack business practices.
+
+Also BNB is a dogwater token, and i hope it goes to zero.
+
+Go to hell "BENANCE"
+"""
+expected = "negative"
+
+
+[[tests]]
+input = """
+Fuck Binance. 
+
+They consistently masquerade as benevolent actors in the space, telling newbies to invest sensibly while simultaneously listing garbage ShibaHarryPotterShitcoin9000 at 100x leverage.
+
+They also provide bridge loans to Bybit because they are 'partners', while simultaneously capitalising on the Hyperliquid FUD by listing $Jelly.
+
+Send $Hype to $100 & $BNB to zero.
+"""
+expected = "negative"
+
+[[tests]]
+input = """
+Corrupt af, full of insider trading, lurking around to kill any competitors, perpetually shorting on all perps listings, only listing spot with big $ or return on exchange rather than users.
+"""
+expected = "negative"

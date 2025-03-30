@@ -4,5 +4,6 @@ export default [
   layout('layouts/sidebar.tsx', [
     index('routes/home.tsx'),
     route('project/:id', 'routes/project.id.tsx'),
+    route('chat', 'routes/chat.tsx'),
   ]),
 ] satisfies RouteConfig;
