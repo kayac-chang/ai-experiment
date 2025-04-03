@@ -4,11 +4,11 @@ import * as Base from '~/components/ui/card';
 import { cn } from '~/lib/utils';
 
 export function Root(props: ComponentProps<typeof Base.Card>) {
-  return <Base.Card {...props} className={cn('@container/card', props.className)} />;
+  return <Base.Card {...props} className={cn('@container/card relative', props.className)} />;
 }
 
 export function Header(props: ComponentProps<typeof Base.CardHeader>) {
-  return <Base.CardHeader {...props} className={cn('relative', props.className)} />;
+  return <Base.CardHeader {...props} />;
 }
 
 export function Title(props: ComponentProps<typeof Base.CardTitle>) {

@@ -8,7 +8,7 @@ function KeyMetrics() {
       <KPICard.Root>
         {/* card header */}
         <KPICard.Header>
-          <KPICard.Description>Total Number Of Tweets</KPICard.Description>
+          <KPICard.Description>Total Tweets</KPICard.Description>
           <KPICard.Title>1,250</KPICard.Title>
 
           <KPICard.Badge>

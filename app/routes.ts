@@ -5,7 +5,7 @@ export default [
   route(
     // 'sentiment-reports/binance',
     '/',
-    'routes/sentiment-report.tsx'
+    'routes/sentiment-report/index.tsx'
   ),
   //
 ] satisfies RouteConfig;
