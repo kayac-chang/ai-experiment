@@ -12,6 +12,7 @@ import { Percent } from 'lucide-react';
 import { Toggle } from '~/components/ui/toggle';
 import { useState } from 'react';
 import { percentFormatter, compactFormatter } from '~/lib/formatters';
+import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip';
 
 const chartConfig = {
   positive: {
@@ -78,60 +79,62 @@ function SentimentBySources() {
   const [showPercentage, setShowPercentage] = useState(false);
 
   return (
-    <Card className="relative flex-row">
-      <div className="flex-1">
-        <CardHeader>
-          <div className="flex justify-between">
-            <div>
-              <CardTitle>Sentiment By Sources</CardTitle>
-              <CardDescription className="mt-2 max-w-xl leading-6">
-                Compares sentiment trends across different social media platforms, such as Twitter,
-                Reddit, or Facebook. Reveals how sentiment varies depending on the data source.
-              </CardDescription>
-            </div>
+    <Card className="relative">
+      <CardHeader>
+        <CardTitle>Sentiment By Sources</CardTitle>
+        <CardDescription className="mt-2 max-w-xl leading-6">
+          Compares sentiment trends across different social media platforms, such as Twitter,
+          Reddit, or Facebook. Reveals how sentiment varies depending on the data source.
+        </CardDescription>
+      </CardHeader>
 
+      <CardContent>
+        <div className="flex justify-end">
+          <Tooltip>
             <Toggle
               className="absolute top-0 right-0 sm:static"
               variant="outline"
-              aria-label="Toggle Percentage"
               pressed={showPercentage}
               onPressedChange={setShowPercentage}
+              asChild
             >
-              <Percent />
+              <TooltipTrigger>
+                <Percent />
+              </TooltipTrigger>
             </Toggle>
-          </div>
-        </CardHeader>
 
-        <CardContent className="mt-4">
-          <ChartContainer config={chartConfig} className="max-h-[40vh] w-full">
-            <BarChart
-              data={showPercentage ? percentData : rawData}
-              accessibilityLayer
-              layout="vertical"
-              barSize={20}
-            >
-              <ChartTooltip
-                content={
-                  <ChartTooltipContent
-                    valueFormatter={formatNumber(showPercentage ? 'percent' : 'number')}
-                  />
-                }
-              />
-              <ChartLegend content={<ChartLegendContent />} />
-              <CartesianGrid horizontal={false} />
-              <YAxis dataKey="source" type="category" tickMargin={10} />
-              <XAxis
-                type="number"
-                domain={showPercentage ? [0, 1] : undefined}
-                tickFormatter={formatNumber(showPercentage ? 'percent' : 'number')}
-              />
-              <Bar dataKey="positive" stackId="sentiment" fill="var(--color-positive)" />
-              <Bar dataKey="negative" stackId="sentiment" fill="var(--color-negative)" />
-              <Bar dataKey="neutral" stackId="sentiment" fill="var(--color-neutral)" />
-            </BarChart>
-          </ChartContainer>
-        </CardContent>
-      </div>
+            <TooltipContent>Toggle Percentage</TooltipContent>
+          </Tooltip>
+        </div>
+
+        <ChartContainer config={chartConfig} className="mt-4 max-h-[40vh] w-full">
+          <BarChart
+            data={showPercentage ? percentData : rawData}
+            accessibilityLayer
+            layout="vertical"
+            barSize={20}
+          >
+            <ChartTooltip
+              content={
+                <ChartTooltipContent
+                  valueFormatter={formatNumber(showPercentage ? 'percent' : 'number')}
+                />
+              }
+            />
+            <ChartLegend content={<ChartLegendContent />} />
+            <CartesianGrid horizontal={false} />
+            <YAxis dataKey="source" type="category" tickMargin={10} />
+            <XAxis
+              type="number"
+              domain={showPercentage ? [0, 1] : undefined}
+              tickFormatter={formatNumber(showPercentage ? 'percent' : 'number')}
+            />
+            <Bar dataKey="positive" stackId="sentiment" fill="var(--color-positive)" />
+            <Bar dataKey="negative" stackId="sentiment" fill="var(--color-negative)" />
+            <Bar dataKey="neutral" stackId="sentiment" fill="var(--color-neutral)" />
+          </BarChart>
+        </ChartContainer>
+      </CardContent>
     </Card>
   );
 }

@@ -1,25 +1,6 @@
 import { TrendingUpIcon, RepeatIcon, HeartIcon, MessageCircleIcon } from 'lucide-react';
 import KPICard from '~/components/kpi-card';
-import {
-  ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from '~/components/ui/chart';
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Label,
-  Line,
-  LineChart,
-  Pie,
-  PieChart,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import SentimentTrends from './sentiment-trends';
 import {
   Table,
   TableBody,
@@ -30,21 +11,6 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import SentimentBySources from './sentiment-by-sources';
-
-const chartConfig = {
-  positive: {
-    label: 'Positive',
-    color: 'var(--chart-5)',
-  },
-  negative: {
-    label: 'Negative',
-    color: 'var(--chart-2)',
-  },
-  neutral: {
-    label: 'Neutral',
-    color: 'var(--chart-3)',
-  },
-} satisfies ChartConfig;
 
 export default function SentimentReport() {
   return (
@@ -162,60 +128,8 @@ export default function SentimentReport() {
           <SentimentBySources />
         </div>
 
-        <div className="mt-4 rounded-xl border p-6 py-12">
-          <ChartContainer config={chartConfig} className="h-[50vh] w-full">
-            <LineChart
-              accessibilityLayer
-              data={[
-                { date: 'Apr 1', positive: 42, negative: 18, neutral: 25 },
-                { date: 'Apr 3', positive: 48, negative: 22, neutral: 30 },
-                { date: 'Apr 5', positive: 55, negative: 20, neutral: 28 },
-                { date: 'Apr 7', positive: 60, negative: 25, neutral: 32 },
-                { date: 'Apr 9', positive: 58, negative: 30, neutral: 35 },
-                { date: 'Apr 11', positive: 65, negative: 28, neutral: 30 },
-                { date: 'Apr 13', positive: 70, negative: 32, neutral: 38 },
-                { date: 'Apr 15', positive: 75, negative: 35, neutral: 40 },
-                { date: 'Apr 17', positive: 80, negative: 30, neutral: 42 },
-                { date: 'Apr 19', positive: 85, negative: 28, neutral: 45 },
-                { date: 'Apr 21', positive: 90, negative: 32, neutral: 48 },
-                { date: 'Apr 23', positive: 95, negative: 35, neutral: 50 },
-                { date: 'Apr 25', positive: 100, negative: 38, neutral: 52 },
-                { date: 'Apr 27', positive: 105, negative: 40, neutral: 55 },
-                { date: 'Apr 29', positive: 110, negative: 42, neutral: 58 },
-              ]}
-            >
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <ChartLegend content={<ChartLegendContent />} />
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis>
-                <Label
-                  value="Tweet Volume"
-                  angle={-90}
-                  position="insideLeft"
-                  style={{ textAnchor: 'middle' }}
-                />
-              </YAxis>
-              <Line
-                type="monotone"
-                dataKey="positive"
-                stroke={chartConfig.positive.color}
-                strokeWidth={2}
-              />
-              <Line
-                type="monotone"
-                dataKey="negative"
-                stroke={chartConfig.negative.color}
-                strokeWidth={2}
-              />
-              <Line
-                type="monotone"
-                dataKey="neutral"
-                stroke={chartConfig.neutral.color}
-                strokeWidth={2}
-              />
-            </LineChart>
-          </ChartContainer>
+        <div className="mt-4">
+          <SentimentTrends />
         </div>
       </section>
 
