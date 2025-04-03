@@ -3,6 +3,7 @@ import SentimentTrends from './sentiment-trends';
 import SentimentBySources from './sentiment-by-sources';
 import KeyMetrics from './key-metrics';
 import Topics from './topics';
+import Influencer from './influencer';
 
 export default function SentimentReport() {
   return (
@@ -76,6 +77,10 @@ export default function SentimentReport() {
           Identifies key accounts or figures who have a significant impact on sentiment and
           engagement. Useful for understanding whose voices are shaping the conversation.
         </p>
+
+        <div className="mt-8">
+          <Influencer />
+        </div>
       </section>
     </div>
   );

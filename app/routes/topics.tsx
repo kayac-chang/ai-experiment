@@ -179,7 +179,7 @@ function Topics() {
             <Tooltip>
               <ToggleGroupItem value="percentage" asChild>
                 <TooltipTrigger>
-                  <PieChartIcon className="h-4 w-4" />
+                  <PieChartIcon />
                 </TooltipTrigger>
               </ToggleGroupItem>
               <TooltipContent>Percentage View</TooltipContent>
@@ -187,7 +187,7 @@ function Topics() {
             <Tooltip>
               <ToggleGroupItem value="bar" asChild>
                 <TooltipTrigger>
-                  <BarChart3Icon className="h-4 w-4" />
+                  <BarChart3Icon />
                 </TooltipTrigger>
               </ToggleGroupItem>
               <TooltipContent>Bar View</TooltipContent>

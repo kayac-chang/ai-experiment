@@ -8,7 +8,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '~/components/ui/chart';
-import { Percent } from 'lucide-react';
+import { Percent, PieChart } from 'lucide-react';
 import { Toggle } from '~/components/ui/toggle';
 import { useState } from 'react';
 import { percentFormatter, compactFormatter } from '~/lib/formatters';
@@ -99,11 +99,11 @@ function SentimentBySources() {
               asChild
             >
               <TooltipTrigger>
-                <Percent />
+                <PieChart />
               </TooltipTrigger>
             </Toggle>
 
-            <TooltipContent>Toggle Percentage</TooltipContent>
+            <TooltipContent>Percentage View</TooltipContent>
           </Tooltip>
         </div>
 
@@ -131,7 +131,12 @@ function SentimentBySources() {
             />
             <Bar dataKey="positive" stackId="sentiment" fill="var(--color-positive)" />
             <Bar dataKey="negative" stackId="sentiment" fill="var(--color-negative)" />
-            <Bar dataKey="neutral" stackId="sentiment" fill="var(--color-neutral)" />
+            <Bar
+              dataKey="neutral"
+              stackId="sentiment"
+              fill="var(--color-neutral)"
+              radius={[0, 4, 4, 0]}
+            />
           </BarChart>
         </ChartContainer>
       </CardContent>
