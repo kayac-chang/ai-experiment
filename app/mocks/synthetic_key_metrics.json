@@ -1,0 +1,23 @@
+{
+  "totalTweets": {
+    "value": 1250,
+    "percentChange": 12.5,
+    "trend": "up",
+    "startDate": "2025-04-01"
+  },
+  "averageRetweets": {
+    "value": 45,
+    "percentChange": 8.2,
+    "trend": "up"
+  },
+  "averageLikes": {
+    "value": 120,
+    "percentChange": 15.3,
+    "trend": "up"
+  },
+  "averageReplies": {
+    "value": 12,
+    "percentChange": 5.7,
+    "trend": "up"
+  }
+}

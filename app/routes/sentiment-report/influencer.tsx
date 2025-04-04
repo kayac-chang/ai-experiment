@@ -7,64 +7,8 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '~/components/ui/chart';
-import { compactFormatter } from '~/lib/formatters';
-
-// Mock data for top influencers with mentions and sentiment
-const influencerData = [
-  {
-    name: '@techguru',
-    mentions: 1250,
-    sentiment: 0.78, // Positive sentiment (0 to 1 scale)
-  },
-  {
-    name: '@marketwatch',
-    mentions: 980,
-    sentiment: 0.65,
-  },
-  {
-    name: '@newsbreaker',
-    mentions: 850,
-    sentiment: 0.42, // Neutral sentiment
-  },
-  {
-    name: '@criticreview',
-    mentions: 720,
-    sentiment: 0.15, // Negative sentiment
-  },
-  {
-    name: '@industryinsider',
-    mentions: 680,
-    sentiment: 0.55,
-  },
-  {
-    name: '@trendspotter',
-    mentions: 590,
-    sentiment: 0.82,
-  },
-  {
-    name: '@analyticspro',
-    mentions: 520,
-    sentiment: 0.35,
-  },
-  {
-    name: '@techcritic',
-    mentions: 480,
-    sentiment: 0.25,
-  },
-  {
-    name: '@productreview',
-    mentions: 420,
-    sentiment: 0.68,
-  },
-  {
-    name: '@marketanalyst',
-    mentions: 380,
-    sentiment: 0.48,
-  },
-];
-
-// Sort data by mentions in descending order
-const sortedData = [...influencerData].sort((a, b) => b.mentions - a.mentions);
+import { compactFormatter, percentFormatter } from '~/lib/formatters';
+import { useSentimentInfluencerData } from './loader';
 
 // Function to determine bar color based on sentiment
 const getSentimentColor = (sentiment: number) => {
@@ -94,13 +38,14 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 function Influencer() {
-  const displayData = sortedData;
+  const data = useSentimentInfluencerData();
+  const displayData = [...data].sort((a, b) => b.mentions - a.mentions);
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Top Influencers by Mentions</CardTitle>
-        <CardDescription className="mt-2 max-w-xl leading-6">
+        <CardDescription data-desc className="mt-2">
           Shows the most mentioned influencers across social media platforms, with bars colored by
           sentiment. Green indicates positive sentiment, blue indicates neutral, and red indicates
           negative sentiment.
@@ -126,10 +71,9 @@ function Influencer() {
                         <div className="flex items-center justify-between gap-2">
                           <span>Sentiment:</span>
                           <span className="font-mono font-medium">
-                            <span
+                            <strong
                               style={{
                                 color: getSentimentColor(item.sentiment),
-                                fontWeight: 'bold',
                               }}
                             >
                               {match(item.sentiment)
@@ -142,8 +86,8 @@ function Influencer() {
                                   () => 'neutral'
                                 )
                                 .otherwise(() => 'negative')}
-                            </span>{' '}
-                            ({(item.sentiment * 100).toFixed(0)}%)
+                            </strong>{' '}
+                            ({percentFormatter.format(item.sentiment)})
                           </span>
                         </div>
                       </div>

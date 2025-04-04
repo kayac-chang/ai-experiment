@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { match, P } from 'ts-pattern';
+import { BarChart3Icon, PieChartIcon } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 import {
   Table,
@@ -11,108 +13,8 @@ import {
 import { Badge } from '~/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip';
 import { ToggleGroup, ToggleGroupItem } from '~/components/ui/toggle-group';
-import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  ArrowRightIcon,
-  BarChart3Icon,
-  PieChartIcon,
-} from 'lucide-react';
-
-// Mock data for sentiment by topic
-const topicSentimentData = [
-  {
-    id: 1,
-    topic: 'Product Launch',
-    positive: 65,
-    negative: 15,
-    neutral: 20,
-    total: 100,
-    trend: 'up',
-    keywords: ['innovation', 'features', 'pricing', 'availability'],
-  },
-  {
-    id: 2,
-    topic: 'Customer Service',
-    positive: 45,
-    negative: 35,
-    neutral: 20,
-    total: 100,
-    trend: 'down',
-    keywords: ['response time', 'resolution', 'support', 'helpdesk'],
-  },
-  {
-    id: 3,
-    topic: 'Brand Reputation',
-    positive: 70,
-    negative: 10,
-    neutral: 20,
-    total: 100,
-    trend: 'up',
-    keywords: ['trust', 'quality', 'reliability', 'values'],
-  },
-  {
-    id: 4,
-    topic: 'Pricing Strategy',
-    positive: 30,
-    negative: 50,
-    neutral: 20,
-    total: 100,
-    trend: 'down',
-    keywords: ['expensive', 'value', 'subscription', 'discount'],
-  },
-  {
-    id: 5,
-    topic: 'User Experience',
-    positive: 55,
-    negative: 25,
-    neutral: 20,
-    total: 100,
-    trend: 'neutral',
-    keywords: ['usability', 'interface', 'design', 'accessibility'],
-  },
-  {
-    id: 6,
-    topic: 'Competitor Comparison',
-    positive: 40,
-    negative: 30,
-    neutral: 30,
-    total: 100,
-    trend: 'neutral',
-    keywords: ['features', 'price', 'quality', 'alternatives'],
-  },
-  {
-    id: 7,
-    topic: 'Marketing Campaign',
-    positive: 60,
-    negative: 20,
-    neutral: 20,
-    total: 100,
-    trend: 'up',
-    keywords: ['creative', 'messaging', 'reach', 'engagement'],
-  },
-  {
-    id: 8,
-    topic: 'Social Responsibility',
-    positive: 75,
-    negative: 5,
-    neutral: 20,
-    total: 100,
-    trend: 'up',
-    keywords: ['sustainability', 'ethics', 'community', 'environment'],
-  },
-];
-
-function SentimentTrendIcon({ trend }: { trend: string }) {
-  switch (trend) {
-    case 'up':
-      return <ArrowUpIcon className="h-4 w-4 text-green-500" />;
-    case 'down':
-      return <ArrowDownIcon className="h-4 w-4 text-red-500" />;
-    default:
-      return <ArrowRightIcon className="h-4 w-4 text-yellow-500" />;
-  }
-}
+import { percentFormatter } from '~/lib/formatters';
+import { useSentimentTopicsData } from './loader';
 
 function SentimentBar({
   positive,
@@ -125,9 +27,9 @@ function SentimentBar({
 }) {
   return (
     <div className="flex h-2 w-full overflow-hidden rounded-full">
-      <div className="bg-[var(--chart-5)]" style={{ width: `${positive}%` }} />
-      <div className="bg-[var(--chart-2)]" style={{ width: `${negative}%` }} />
-      <div className="bg-[var(--chart-3)]" style={{ width: `${neutral}%` }} />
+      <div className="bg-[var(--chart-5)]" style={{ width: `${positive * 100}%` }} />
+      <div className="bg-[var(--chart-2)]" style={{ width: `${negative * 100}%` }} />
+      <div className="bg-[var(--chart-3)]" style={{ width: `${neutral * 100}%` }} />
     </div>
   );
 }
@@ -148,21 +50,33 @@ function Topics() {
     }
   };
 
-  const sortedData = [...topicSentimentData].sort((a, b) => {
-    if (sortBy === 'topic') {
-      return sortDirection === 'asc'
-        ? a.topic.localeCompare(b.topic)
-        : b.topic.localeCompare(a.topic);
-    } else {
-      return sortDirection === 'asc' ? a[sortBy] - b[sortBy] : b[sortBy] - a[sortBy];
-    }
-  });
+  const data = useSentimentTopicsData();
+
+  const sortedData = [...data['percent']].sort((a, b) =>
+    match({ sortBy, sortDirection })
+      .with({ sortBy: 'topic', sortDirection: 'asc' }, () => a.topic.localeCompare(b.topic))
+      .with({ sortBy: 'topic', sortDirection: 'desc' }, () => b.topic.localeCompare(a.topic))
+      .with(
+        { sortBy: P.union('total', 'negative', 'positive', 'neutral'), sortDirection: 'asc' },
+        ({ sortBy }) => a[sortBy] - b[sortBy]
+      )
+      .with(
+        {
+          sortBy: P.union('total', 'negative', 'positive', 'neutral'),
+          sortDirection: 'desc',
+        },
+        ({ sortBy }) => b[sortBy] - a[sortBy]
+      )
+      .otherwise(() => 0)
+  );
+
+  const direction = sortDirection === 'asc' ? '↑' : '↓';
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Sentiment by Topic</CardTitle>
-        <CardDescription className="mt-2 max-w-xl leading-6">
+        <CardTitle>Sentiment by Topics</CardTitle>
+        <CardDescription data-desc className="mt-2">
           Analyzes sentiment distribution across different topics or themes mentioned in social
           media conversations. This helps identify which topics generate positive, negative, or
           neutral reactions.
@@ -173,7 +87,11 @@ function Topics() {
           <ToggleGroup
             type="single"
             value={viewType}
-            onValueChange={(value) => value && setViewType(value as 'percentage' | 'bar')}
+            onValueChange={(value) =>
+              match(value)
+                .with('percentage', 'bar', setViewType)
+                .otherwise(() => {})
+            }
             variant="outline"
           >
             <Tooltip>
@@ -199,57 +117,60 @@ function Topics() {
           <TableHeader>
             <TableRow>
               <TableHead className="cursor-pointer" onClick={() => handleSort('topic')}>
-                Topic {sortBy === 'topic' && (sortDirection === 'asc' ? '↑' : '↓')}
+                Topic {sortBy === 'topic' && direction}
               </TableHead>
               <TableHead
                 className="cursor-pointer text-right"
                 onClick={() => handleSort('positive')}
               >
-                Positive {sortBy === 'positive' && (sortDirection === 'asc' ? '↑' : '↓')}
+                Positive {sortBy === 'positive' && direction}
               </TableHead>
               <TableHead
                 className="cursor-pointer text-right"
                 onClick={() => handleSort('negative')}
               >
-                Negative {sortBy === 'negative' && (sortDirection === 'asc' ? '↑' : '↓')}
+                Negative {sortBy === 'negative' && direction}
               </TableHead>
               <TableHead
                 className="cursor-pointer text-right"
                 onClick={() => handleSort('neutral')}
               >
-                Neutral {sortBy === 'neutral' && (sortDirection === 'asc' ? '↑' : '↓')}
+                Neutral {sortBy === 'neutral' && direction}
               </TableHead>
               <TableHead className="cursor-pointer text-right" onClick={() => handleSort('total')}>
-                Total {sortBy === 'total' && (sortDirection === 'asc' ? '↑' : '↓')}
+                Total {sortBy === 'total' && direction}
               </TableHead>
-              <TableHead className="text-center">Trend</TableHead>
               <TableHead>Keywords</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {sortedData.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow key={row.topic}>
                 <TableCell className="font-medium">{row.topic}</TableCell>
                 <TableCell className="text-right">
                   {viewType === 'percentage' ? (
-                    <span className="text-[var(--chart-5)]">{row.positive}%</span>
+                    <span className="text-[var(--chart-5)]">
+                      {percentFormatter.format(row.positive)}
+                    </span>
                   ) : (
                     <div className="bg-muted h-2.5 w-full rounded-full">
                       <div
                         className="h-2.5 rounded-full bg-[var(--chart-5)]"
-                        style={{ width: `${row.positive}%` }}
+                        style={{ width: `${row.positive * 100}%` }}
                       ></div>
                     </div>
                   )}
                 </TableCell>
                 <TableCell className="text-right">
                   {viewType === 'percentage' ? (
-                    <span className="text-[var(--chart-2)]">{row.negative}%</span>
+                    <span className="text-[var(--chart-2)]">
+                      {percentFormatter.format(row.negative)}
+                    </span>
                   ) : (
                     <div className="bg-muted h-2.5 w-full rounded-full">
                       <div
                         className="h-2.5 rounded-full bg-[var(--chart-2)]"
-                        style={{ width: `${row.negative}%` }}
+                        style={{ width: `${row.negative * 100}%` }}
                       ></div>
                     </div>
                   )}
@@ -261,19 +182,16 @@ function Topics() {
                     <div className="bg-muted h-2.5 w-full rounded-full">
                       <div
                         className="h-2.5 rounded-full bg-[var(--chart-3)]"
-                        style={{ width: `${row.neutral}%` }}
+                        style={{ width: `${row.neutral * 100}%` }}
                       ></div>
                     </div>
                   )}
                 </TableCell>
                 <TableCell className="text-right">{row.total}</TableCell>
-                <TableCell className="text-center">
-                  <SentimentTrendIcon trend={row.trend} />
-                </TableCell>
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
-                    {row.keywords.map((keyword, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
+                    {row.keywords.map((keyword) => (
+                      <Badge key={keyword} variant="outline" className="text-xs">
                         {keyword}
                       </Badge>
                     ))}
@@ -284,17 +202,14 @@ function Topics() {
           </TableBody>
         </Table>
 
-        <div className="mt-6">
-          <h4 className="mb-2">Sentiment Distribution</h4>
-          <div className="space-y-3">
+        <div className="mt-8">
+          <CardTitle>Sentiment Distribution</CardTitle>
+
+          <div className="mt-4 space-y-3">
             {sortedData.map((row) => (
-              <div key={row.id} className="space-y-1">
+              <div key={row.topic} className="space-y-1">
                 <div className="flex justify-between text-sm">
                   <span>{row.topic}</span>
-                  <span className="flex items-center gap-1">
-                    <SentimentTrendIcon trend={row.trend} />
-                    <span>{row.positive}% positive</span>
-                  </span>
                 </div>
                 <SentimentBar
                   positive={row.positive}

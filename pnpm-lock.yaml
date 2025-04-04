@@ -86,6 +86,9 @@ importers:
       lucide-react:
         specifier: ^0.484.0
         version: 0.484.0(react@19.1.0)
+      p-props:
+        specifier: ^6.0.0
+        version: 6.0.0
       pocketbase:
         specifier: ^0.25.2
         version: 0.25.2
@@ -3236,6 +3239,14 @@ packages:
   p-locate@3.0.0:
     resolution: {integrity: sha512-x+12w/To+4GFfgJhBEpiDcLozRJGegY+Ei7/z0tSLkMmxGZNybVMSfWj9aJn8Z5Fc7dBUNJOOVgPv2H7IwulSQ==}
     engines: {node: '>=6'}
+
+  p-map@6.0.0:
+    resolution: {integrity: sha512-T8BatKGY+k5rU+Q/GTYgrEf2r4xRMevAN5mtXc2aPc4rS1j3s+vWTaO2Wag94neXuCAUAs8cxBL9EeB5EA6diw==}
+    engines: {node: '>=16'}
+
+  p-props@6.0.0:
+    resolution: {integrity: sha512-vk89p9/3y/53LtD99tg1Ld2deVb4BXzw3Ekl1/0unNTvHAqbmgrf+T7eLDXv0mkVXl0mc/wmJoeO00IK7UwF7A==}
+    engines: {node: '>=18'}
 
   p-try@2.2.0:
     resolution: {integrity: sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==}
@@ -7419,6 +7430,12 @@ snapshots:
   p-locate@3.0.0:
     dependencies:
       p-limit: 2.3.0
+
+  p-map@6.0.0: {}
+
+  p-props@6.0.0:
+    dependencies:
+      p-map: 6.0.0
 
   p-try@2.2.0: {}
 

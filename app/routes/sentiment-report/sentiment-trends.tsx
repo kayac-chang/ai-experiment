@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import { format } from 'date-fns/format';
+import { ChartArea, ChartLine } from 'lucide-react';
 import { CartesianGrid, Line, LineChart, Area, AreaChart, XAxis, YAxis } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 import {
@@ -10,10 +13,7 @@ import {
 } from '~/components/ui/chart';
 import { ToggleGroup, ToggleGroupItem } from '~/components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip';
-import mockdata from '~/mocks/synthetic_sentiment_xcom_april_2025.json' with { type: 'json' };
-import { format } from 'date-fns/format';
-import { useState } from 'react';
-import { ChartArea, ChartLine } from 'lucide-react';
+import { useSentimentTrendsData } from './loader';
 
 const chartConfig = {
   positive: {
@@ -30,12 +30,11 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const sentimentTrendsData = mockdata;
-
 function SentimentTrendsLine() {
+  const data = useSentimentTrendsData();
   return (
     <ChartContainer config={chartConfig} className="mt-4 h-[50vh] w-full">
-      <LineChart accessibilityLayer data={sentimentTrendsData}>
+      <LineChart accessibilityLayer data={data}>
         <ChartTooltip content={<ChartTooltipContent />} />
         <ChartLegend content={<ChartLegendContent />} />
         <CartesianGrid strokeDasharray="3 3" />
@@ -50,9 +49,10 @@ function SentimentTrendsLine() {
 }
 
 function SentimentTrendsArea() {
+  const data = useSentimentTrendsData();
   return (
     <ChartContainer config={chartConfig} className="mt-4 h-[50vh] w-full">
-      <AreaChart accessibilityLayer data={sentimentTrendsData}>
+      <AreaChart accessibilityLayer data={data}>
         <ChartTooltip content={<ChartTooltipContent />} />
         <ChartLegend content={<ChartLegendContent />} />
         <CartesianGrid strokeDasharray="3 3" />
@@ -94,7 +94,7 @@ function SentimentTrends() {
     <Card>
       <CardHeader>
         <CardTitle>Sentiment Trends Across Platforms</CardTitle>
-        <CardDescription className="mt-2 max-w-xl leading-6">
+        <CardDescription data-desc className="mt-2">
           Tracks how sentiment changes over time across X.com, Reddit, and TikTok to identify
           patterns, spikes, or shifts in public opinion. Useful for comparing reactions to specific
           events or campaigns across different social media platforms.

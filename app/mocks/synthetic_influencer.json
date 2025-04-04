@@ -1,0 +1,52 @@
+[
+  {
+    "name": "@techguru",
+    "mentions": 1250,
+    "sentiment": 0.78
+  },
+  {
+    "name": "@marketwatch",
+    "mentions": 980,
+    "sentiment": 0.65
+  },
+  {
+    "name": "@newsbreaker",
+    "mentions": 850,
+    "sentiment": 0.42
+  },
+  {
+    "name": "@criticreview",
+    "mentions": 720,
+    "sentiment": 0.15
+  },
+  {
+    "name": "@industryinsider",
+    "mentions": 680,
+    "sentiment": 0.55
+  },
+  {
+    "name": "@trendspotter",
+    "mentions": 590,
+    "sentiment": 0.82
+  },
+  {
+    "name": "@analyticspro",
+    "mentions": 520,
+    "sentiment": 0.35
+  },
+  {
+    "name": "@techcritic",
+    "mentions": 480,
+    "sentiment": 0.25
+  },
+  {
+    "name": "@productreview",
+    "mentions": 420,
+    "sentiment": 0.68
+  },
+  {
+    "name": "@marketanalyst",
+    "mentions": 380,
+    "sentiment": 0.48
+  }
+]

@@ -1,7 +1,9 @@
-import { TrendingUpIcon, RepeatIcon, HeartIcon, MessageCircleIcon } from 'lucide-react';
+import { TrendingUpIcon } from 'lucide-react';
 import KPICard from '~/components/kpi-card';
+import { useSentimentKeyMetricsData } from './loader';
 
 function KeyMetrics() {
+  const data = useSentimentKeyMetricsData();
   return (
     <div className="grid grid-cols-1 gap-4 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
       {/* Total Number Of Tweets */}
@@ -9,20 +11,22 @@ function KeyMetrics() {
         {/* card header */}
         <KPICard.Header>
           <KPICard.Description>Total Tweets</KPICard.Description>
-          <KPICard.Title>1,250</KPICard.Title>
+          <KPICard.Title>{data.totalTweets.value.toLocaleString()}</KPICard.Title>
 
           <KPICard.Badge>
-            <TrendingUpIcon className="size-3" />
-            +12.5%
+            <TrendingUpIcon className="size-3" />+{data.totalTweets.percentChange}%
           </KPICard.Badge>
         </KPICard.Header>
 
         {/* card footer */}
         <KPICard.Footer>
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Trending up this month <TrendingUpIcon className="size-4" />
+            {data.totalTweets.trend === 'up'
+              ? 'Trending up this month'
+              : 'Trending down this month'}
+            <TrendingUpIcon className="size-4" />
           </div>
-          <div className="text-muted-foreground">Tweets over the last 6 months</div>
+          <div className="text-muted-foreground">From {data.totalTweets.startDate}</div>
         </KPICard.Footer>
       </KPICard.Root>
 
@@ -31,20 +35,22 @@ function KeyMetrics() {
         {/* card header */}
         <KPICard.Header>
           <KPICard.Description>Average Retweets</KPICard.Description>
-          <KPICard.Title>45</KPICard.Title>
+          <KPICard.Title>{data.averageRetweets.value}</KPICard.Title>
 
           <KPICard.Badge>
-            <TrendingUpIcon className="size-3" />
-            +8.2%
+            <TrendingUpIcon className="size-3" />+{data.averageRetweets.percentChange}%
           </KPICard.Badge>
         </KPICard.Header>
 
         {/* card footer */}
         <KPICard.Footer>
           <div className="line-clamp-1 flex gap-2 font-medium">
-            <RepeatIcon className="size-4" /> Per tweet
+            {data.averageRetweets.trend === 'up'
+              ? 'Trending up this month'
+              : 'Trending down this month'}
+            <TrendingUpIcon className="size-4" />
           </div>
-          <div className="text-muted-foreground">Based on last 100 tweets</div>
+          <div className="text-muted-foreground">Based on last {data.totalTweets.value} tweets</div>
         </KPICard.Footer>
       </KPICard.Root>
 
@@ -53,20 +59,22 @@ function KeyMetrics() {
         {/* card header */}
         <KPICard.Header>
           <KPICard.Description>Average Likes</KPICard.Description>
-          <KPICard.Title>120</KPICard.Title>
+          <KPICard.Title>{data.averageLikes.value}</KPICard.Title>
 
           <KPICard.Badge>
-            <TrendingUpIcon className="size-3" />
-            +15.3%
+            <TrendingUpIcon className="size-3" />+{data.averageLikes.percentChange}%
           </KPICard.Badge>
         </KPICard.Header>
 
         {/* card footer */}
         <KPICard.Footer>
           <div className="line-clamp-1 flex gap-2 font-medium">
-            <HeartIcon className="size-4" /> Per tweet
+            {data.averageLikes.trend === 'up'
+              ? 'Trending up this month'
+              : 'Trending down this month'}
+            <TrendingUpIcon className="size-4" />
           </div>
-          <div className="text-muted-foreground">Based on last 100 tweets</div>
+          <div className="text-muted-foreground">Based on last {data.totalTweets.value} tweets</div>
         </KPICard.Footer>
       </KPICard.Root>
 
@@ -75,20 +83,22 @@ function KeyMetrics() {
         {/* card header */}
         <KPICard.Header>
           <KPICard.Description>Average Replies</KPICard.Description>
-          <KPICard.Title>12</KPICard.Title>
+          <KPICard.Title>{data.averageReplies.value}</KPICard.Title>
 
           <KPICard.Badge>
-            <TrendingUpIcon className="size-3" />
-            +5.7%
+            <TrendingUpIcon className="size-3" />+{data.averageReplies.percentChange}%
           </KPICard.Badge>
         </KPICard.Header>
 
         {/* card footer */}
         <KPICard.Footer>
           <div className="line-clamp-1 flex gap-2 font-medium">
-            <MessageCircleIcon className="size-4" /> Per tweet
+            {data.averageReplies.trend === 'up'
+              ? 'Trending up this month'
+              : 'Trending down this month'}
+            <TrendingUpIcon className="size-4" />
           </div>
-          <div className="text-muted-foreground">Based on last 100 tweets</div>
+          <div className="text-muted-foreground">Based on last {data.totalTweets.value} tweets</div>
         </KPICard.Footer>
       </KPICard.Root>
     </div>

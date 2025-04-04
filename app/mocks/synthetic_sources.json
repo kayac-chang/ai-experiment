@@ -1,0 +1,26 @@
+[
+  {
+    "source": "x.com",
+    "positive": 1000,
+    "negative": 5000,
+    "neutral": 700
+  },
+  {
+    "source": "threads",
+    "positive": 2500,
+    "negative": 1200,
+    "neutral": 800
+  },
+  {
+    "source": "reddit",
+    "positive": 1800,
+    "negative": 3200,
+    "neutral": 1500
+  },
+  {
+    "source": "tiktok",
+    "positive": 3500,
+    "negative": 900,
+    "neutral": 1200
+  }
+]

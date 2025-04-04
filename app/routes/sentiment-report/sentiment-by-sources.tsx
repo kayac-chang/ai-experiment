@@ -1,5 +1,7 @@
+import { useState } from 'react';
+import { PieChart } from 'lucide-react';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
+
 import {
   ChartContainer,
   ChartLegend,
@@ -8,12 +10,15 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '~/components/ui/chart';
-import { Percent, PieChart } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 import { Toggle } from '~/components/ui/toggle';
-import { useState } from 'react';
 import { percentFormatter, compactFormatter } from '~/lib/formatters';
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip';
+import { useSentimentBySourceData } from './loader';
+import { match } from 'ts-pattern';
 
+// Configuration for chart colors and labels
+// Defines the visual representation of each sentiment category
 const chartConfig = {
   positive: {
     label: 'Positive',
@@ -29,60 +34,29 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const rawData = [
-  {
-    source: 'x.com',
-    positive: 1000,
-    negative: 5000,
-    neutral: 700,
-  },
-  {
-    source: 'threads',
-    positive: 2500,
-    negative: 1200,
-    neutral: 800,
-  },
-  {
-    source: 'reddit',
-    positive: 1800,
-    negative: 3200,
-    neutral: 1500,
-  },
-  {
-    source: 'tiktok',
-    positive: 3500,
-    negative: 900,
-    neutral: 1200,
-  },
-];
+type ChartVariant = 'percent' | 'number';
 
-const percentData = rawData.map((item) => {
-  const total = item.positive + item.negative + item.neutral;
-  return {
-    source: item.source,
-    positive: item.positive / total,
-    negative: item.negative / total,
-    neutral: item.neutral / total,
-  };
-});
-
+// Higher-order function that returns a formatter based on the chart variant
+// Used to format values differently depending on whether we're showing percentages or raw numbers
 const formatNumber =
-  (format: 'percent' | 'number' = 'number') =>
+  (format: ChartVariant = 'number') =>
   (value: number) => {
     if (format === 'percent') {
-      return percentFormatter.format(value);
+      return percentFormatter.format(value); // Format as percentage (e.g., 75%)
     }
-    return compactFormatter.format(value);
+    return compactFormatter.format(value); // Format as compact number (e.g., 1.5K)
   };
 
 function SentimentBySources() {
-  const [showPercentage, setShowPercentage] = useState(false);
+  // State to toggle between percentage and raw number display modes
+  const [variant, setVariant] = useState<ChartVariant>('number');
+  const data = useSentimentBySourceData();
 
   return (
     <Card className="relative">
       <CardHeader>
         <CardTitle>Sentiment By Sources</CardTitle>
-        <CardDescription className="mt-2 max-w-xl leading-6">
+        <CardDescription data-desc className="mt-2">
           Compares sentiment trends across different social media platforms, such as Twitter,
           Reddit, or Facebook. Reveals how sentiment varies depending on the data source.
         </CardDescription>
@@ -90,12 +64,13 @@ function SentimentBySources() {
 
       <CardContent>
         <div className="flex justify-end">
+          {/* Toggle button to switch between percentage and raw number views */}
           <Tooltip>
             <Toggle
               className="absolute top-0 right-0 sm:static"
               variant="outline"
-              pressed={showPercentage}
-              onPressedChange={setShowPercentage}
+              pressed={variant === 'percent'}
+              onPressedChange={(pressed) => setVariant(pressed ? 'percent' : 'number')}
               asChild
             >
               <TooltipTrigger>
@@ -103,38 +78,43 @@ function SentimentBySources() {
               </TooltipTrigger>
             </Toggle>
 
-            <TooltipContent>Percentage View</TooltipContent>
+            <TooltipContent>
+              {variant === 'percent' ? 'Number View' : 'Percentage View'}
+            </TooltipContent>
           </Tooltip>
         </div>
 
+        {/* Main chart container with responsive height */}
         <ChartContainer config={chartConfig} className="mt-4 max-h-[40vh] w-full">
+          {/* Stacked bar chart that dynamically uses either percentage or raw data based on selected variant */}
           <BarChart
-            data={showPercentage ? percentData : rawData}
+            data={match(variant)
+              .with('number', () => data.raw)
+              .with('percent', () => data.percent)
+              .exhaustive()}
             accessibilityLayer
             layout="vertical"
             barSize={20}
           >
             <ChartTooltip
-              content={
-                <ChartTooltipContent
-                  valueFormatter={formatNumber(showPercentage ? 'percent' : 'number')}
-                />
-              }
+              content={<ChartTooltipContent valueFormatter={formatNumber(variant)} />}
             />
             <ChartLegend content={<ChartLegendContent />} />
             <CartesianGrid horizontal={false} />
             <YAxis dataKey="source" type="category" tickMargin={10} />
             <XAxis
               type="number"
-              domain={showPercentage ? [0, 1] : undefined}
-              tickFormatter={formatNumber(showPercentage ? 'percent' : 'number')}
+              domain={variant === 'percent' ? [0, 1] : undefined}
+              tickFormatter={formatNumber(variant)}
             />
+            {/* Stacked bars for each sentiment type - all sharing the same stackId to create a stacked effect */}
             <Bar dataKey="positive" stackId="sentiment" fill="var(--color-positive)" />
             <Bar dataKey="negative" stackId="sentiment" fill="var(--color-negative)" />
             <Bar
               dataKey="neutral"
               stackId="sentiment"
               fill="var(--color-neutral)"
+              /* Rounded corners on the right side of the last bar in stack */
               radius={[0, 4, 4, 0]}
             />
           </BarChart>
