@@ -5,10 +5,15 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
+  type LoaderFunctionArgs,
 } from 'react-router';
 
 import type { Route } from './+types/root';
 import './styles/app.css';
+import userPrefsServer from './user-prefs.server';
+import pProps from 'p-props';
+import { cn } from './lib/utils';
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -23,12 +28,16 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+export function loader(args: LoaderFunctionArgs) {
+  return pProps({
+    userPref: userPrefsServer.parse(args.request.headers.get('Cookie')),
+  });
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
+  const data = useLoaderData<typeof loader>();
   return (
-    <html
-      lang="en"
-      // className="dark"
-    >
+    <html lang="en" className={cn(data.userPref?.theme)}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />

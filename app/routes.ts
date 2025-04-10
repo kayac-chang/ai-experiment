@@ -1,11 +1,10 @@
-import { type RouteConfig, index, route, layout } from '@react-router/dev/routes';
+import { type RouteConfig, route, layout } from '@react-router/dev/routes';
 
 export default [
-  // index('routes/home.tsx'),
-  route(
-    // 'sentiment-reports/binance',
-    '/',
-    'routes/sentiment-report/index.tsx'
-  ),
-  //
+  layout('layouts/sidebar.tsx', [
+    route('/', 'routes/sentiment-report/index.tsx'),
+    //
+  ]),
+
+  route('/theme', 'layouts/theme.ts'),
 ] satisfies RouteConfig;
