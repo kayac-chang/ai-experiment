@@ -5,7 +5,143 @@ import KeyMetrics from './key-metrics';
 import Topics from './topics';
 import Influencer from './influencer';
 
-export { loader } from './loader';
+import { type LoaderFunctionArgs } from 'react-router';
+import pProps from 'p-props';
+import ky from 'ky';
+import { z } from 'zod';
+
+const TrendEnum = z.enum(['up', 'down', 'neutral']);
+
+const keyMetricsSchema = z.object({
+  totalTweets: z.object({
+    value: z.number(),
+    percentChange: z.number(),
+    trend: TrendEnum,
+  }),
+  averageRetweets: z.object({
+    value: z.number(),
+    percentChange: z.number(),
+    trend: TrendEnum,
+  }),
+  averageLikes: z.object({
+    value: z.number(),
+    percentChange: z.number(),
+    trend: TrendEnum,
+  }),
+  averageReplies: z.object({
+    value: z.number(),
+    percentChange: z.number(),
+    trend: TrendEnum,
+  }),
+});
+
+/**
+ * Schema for accumulated sentiment data by source
+ * Each entry contains sentiment counts (positive, negative, neutral) for a specific source
+ */
+const accumulateSchema = z.array(
+  z.object({
+    source: z.string(),
+    positive: z.number(),
+    negative: z.number(),
+    neutral: z.number(),
+  })
+);
+
+const recordsSchema = z.array(
+  z.object({
+    date: z.string(),
+    positive: z.number(),
+    negative: z.number(),
+    neutral: z.number(),
+  })
+);
+
+const topicsSchema = z.array(
+  z.object({
+    topic: z.string(),
+    positive: z.number(),
+    negative: z.number(),
+    neutral: z.number(),
+    total: z.number(),
+    positive_keywords: z.array(z.string()),
+    negative_keywords: z.array(z.string()),
+  })
+);
+
+const influencerSchema = z.array(
+  z.object({
+    name: z.string(),
+    influence: z.number(),
+    sentiment: z.number(),
+    source: z.string(),
+  })
+);
+
+export async function loader(_args: LoaderFunctionArgs) {
+  const prefixUrl = process.env.INTERNAL_API;
+  const api = ky.create({ prefixUrl });
+
+  const getKeyMetrics = () =>
+    prefixUrl
+      ? api.get('sentiment-reports/binance/key-metrics').json().then(keyMetricsSchema.parseAsync)
+      : import('~/mocks/synthetic_key_metrics.json').then((mod) => mod.default);
+
+  const getTopics = () =>
+    // prefixUrl ?
+    // api.get('sentiment-reports/binance/topics').json().then(topicsSchema.parseAsync) :
+    import('~/mocks/synthetic_topics.json').then((mod) => mod.default);
+
+  const getAccumulate = () =>
+    prefixUrl
+      ? api.get('sentiment-reports/binance/accumulate').json().then(accumulateSchema.parseAsync)
+      : import('~/mocks/synthetic_sources.json').then((mod) => mod.default);
+
+  const getInfluencer = () =>
+    prefixUrl
+      ? api.get('sentiment-reports/binance/influencer').json().then(influencerSchema.parseAsync)
+      : import('~/mocks/synthetic_influencer.json').then((mod) => mod.default);
+
+  const getRecords = () =>
+    prefixUrl
+      ? api.get('sentiment-reports/binance/records').json().then(recordsSchema.parseAsync)
+      : import('~/mocks/synthetic_sentiment_xcom_april_2025.json').then((mod) => mod.default);
+
+  return pProps({
+    /**
+     * Key performance metrics related to sentiment analysis
+     * Includes metrics like total engagement, average sentiment scores, and trend indicators
+     * Each metric contains current value, percent change, and trend direction
+     */
+    sentiment_by_key_metries: getKeyMetrics(),
+
+    /**
+     * Sentiment data organized by topics
+     * Each topic includes positive, negative, neutral sentiment counts, total count,
+     * and a list of related keywords that define the topic
+     */
+    sentiment_by_topics: getTopics(),
+
+    /**
+     * Sentiment data organized by trends over time
+     * The data includes temporal patterns and trend information for sentiment analysis
+     */
+    sentiment_by_trends: getRecords(),
+
+    /**
+     * Sample data representing sentiment counts across different social media platforms
+     * Each object contains the source name and counts for positive, negative, and neutral sentiments
+     */
+    sentiment_by_sources: getAccumulate(),
+
+    /**
+     * Sentiment data organized by key influencers
+     * Each influencer entry includes their name, reach metrics, and sentiment impact scores
+     * Used to identify individuals with significant influence on overall sentiment
+     */
+    sentiment_by_influencer: getInfluencer(),
+  });
+}
 
 export default function SentimentReport() {
   return (

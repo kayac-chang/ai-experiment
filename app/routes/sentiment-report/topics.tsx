@@ -14,7 +14,7 @@ import { Badge } from '~/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip';
 import { ToggleGroup, ToggleGroupItem } from '~/components/ui/toggle-group';
 import { percentFormatter } from '~/lib/formatters';
-import { useSentimentTopicsData } from './loader';
+import { useSentimentTopicsData } from './hooks';
 
 function SentimentBar({
   positive,

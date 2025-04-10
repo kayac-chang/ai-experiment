@@ -1,6 +1,6 @@
 import { TrendingUpIcon } from 'lucide-react';
 import KPICard from '~/components/kpi-card';
-import { useSentimentKeyMetricsData } from './loader';
+import { useSentimentKeyMetricsData } from './hooks';
 
 function KeyMetrics() {
   const data = useSentimentKeyMetricsData();

@@ -13,7 +13,7 @@ import {
 } from '~/components/ui/chart';
 import { ToggleGroup, ToggleGroupItem } from '~/components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip';
-import { useSentimentTrendsData } from './loader';
+import { useSentimentTrendsData } from './hooks';
 
 const chartConfig = {
   positive: {

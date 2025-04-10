@@ -14,7 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/com
 import { Toggle } from '~/components/ui/toggle';
 import { percentFormatter, compactFormatter } from '~/lib/formatters';
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip';
-import { useSentimentBySourceData } from './loader';
+import { useSentimentBySourceData } from './hooks';
 import { match } from 'ts-pattern';
 
 // Configuration for chart colors and labels

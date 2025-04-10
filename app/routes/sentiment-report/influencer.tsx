@@ -8,7 +8,7 @@ import {
   type ChartConfig,
 } from '~/components/ui/chart';
 import { compactFormatter, percentFormatter } from '~/lib/formatters';
-import { useSentimentInfluencerData } from './loader';
+import { useSentimentInfluencerData } from './hooks';
 
 // Function to determine bar color based on sentiment
 const getSentimentColor = (sentiment: number) => {
@@ -39,7 +39,7 @@ const chartConfig = {
 
 function Influencer() {
   const data = useSentimentInfluencerData();
-  const displayData = [...data].sort((a, b) => b.mentions - a.mentions);
+  const displayData = [...data].sort((a, b) => b.influence - a.influence);
 
   return (
     <Card>
