@@ -1,6 +1,7 @@
 import { TrendingUpIcon } from 'lucide-react';
 import KPICard from '~/components/kpi-card';
 import { useSentimentKeyMetricsData } from './hooks';
+import { format } from 'date-fns/format';
 
 function KeyMetrics() {
   const data = useSentimentKeyMetricsData();
@@ -26,7 +27,9 @@ function KeyMetrics() {
               : 'Trending down this month'}
             <TrendingUpIcon className="size-4" />
           </div>
-          <div className="text-muted-foreground">From {data.totalTweets.startDate}</div>
+          <div className="text-muted-foreground">
+            From {format(data.totalTweets.startDate, 'yyyy/MM/dd')}
+          </div>
         </KPICard.Footer>
       </KPICard.Root>
 

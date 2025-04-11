@@ -41,19 +41,30 @@ export function useSentimentTrendsData() {
 export function useSentimentTopicsData() {
   const data = useLoaderData<typeof loader>();
 
+  // workaround
+  const sentiment_by_topics = data.sentiment_by_topics
+    .sort((a, b) => b.total - a.total)
+    .slice(0, 10)
+    .map((item) => ({
+      ...item,
+      positive_keywords: item.positive_keywords.slice(0, 5),
+      negative_keywords: item.negative_keywords.slice(0, 5),
+    }));
+
   return {
     // Raw topic data with counts
-    raw: data.sentiment_by_topics,
+    raw: sentiment_by_topics,
 
     // Transform raw count data into percentage data
     // Useful for visualization components that work with percentages
-    percent: data.sentiment_by_topics.map((item) => ({
+    percent: sentiment_by_topics.map((item) => ({
       topic: item.topic,
       positive: item.positive / item.total,
       negative: item.negative / item.total,
       neutral: item.neutral / item.total,
-      total: 100,
-      keywords: item.keywords,
+      total: item.total,
+      positive_keywords: item.positive_keywords,
+      negative_keywords: item.negative_keywords,
     })),
   };
 }

@@ -177,7 +177,9 @@ function Topics() {
                 </TableCell>
                 <TableCell className="text-right">
                   {viewType === 'percentage' ? (
-                    <span className="text-[var(--chart-3)]">{row.neutral}%</span>
+                    <span className="text-[var(--chart-3)]">
+                      {percentFormatter.format(row.neutral)}
+                    </span>
                   ) : (
                     <div className="bg-muted h-2.5 w-full rounded-full">
                       <div
@@ -190,7 +192,13 @@ function Topics() {
                 <TableCell className="text-right">{row.total}</TableCell>
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
-                    {row.keywords.map((keyword) => (
+                    {row.positive_keywords.map((keyword) => (
+                      <Badge key={keyword} variant="outline" className="text-xs">
+                        {keyword}
+                      </Badge>
+                    ))}
+
+                    {row.negative_keywords.map((keyword) => (
                       <Badge key={keyword} variant="outline" className="text-xs">
                         {keyword}
                       </Badge>

@@ -49,7 +49,7 @@ export default function SidebarLayout({ loaderData }: Route.ComponentProps) {
   const onCheckedChange = () => fetcher.submit(null, { action: '/theme', method: 'post' });
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       {/* AppSidebar */}
       <Sidebar variant="inset">
         <SidebarHeader />

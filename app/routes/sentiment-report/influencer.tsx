@@ -12,9 +12,9 @@ import { useSentimentInfluencerData } from './hooks';
 
 // Function to determine bar color based on sentiment
 const getSentimentColor = (sentiment: number) => {
-  if (sentiment >= 0.6) return 'var(--chart-5)'; // Positive - green
-  if (sentiment >= 0.4) return 'var(--chart-3)'; // Neutral - blue
-  return 'var(--chart-2)'; // Negative - red
+  if (sentiment > 0) return 'var(--chart-5)'; // Positive - green
+  if (sentiment < 0) return 'var(--chart-2)'; // Neutral - blue
+  return 'var(--chart-3)'; // Negative - red
 };
 
 // Chart configuration
@@ -39,7 +39,7 @@ const chartConfig = {
 
 function Influencer() {
   const data = useSentimentInfluencerData();
-  const displayData = [...data].sort((a, b) => b.influence - a.influence);
+  const displayData = [...data].sort((a, b) => b.influence - a.influence).slice(0, 10);
 
   return (
     <Card>
@@ -63,9 +63,9 @@ function Influencer() {
                     return (
                       <div className="grid gap-2">
                         <div className="flex items-center justify-between gap-2">
-                          <span>Mentions:</span>
+                          <span>Influence:</span>
                           <span className="font-mono font-medium">
-                            {compactFormatter.format(item.mentions)}
+                            {compactFormatter.format(item.influence)}
                           </span>
                         </div>
                         <div className="flex items-center justify-between gap-2">
@@ -78,14 +78,14 @@ function Influencer() {
                             >
                               {match(item.sentiment)
                                 .when(
-                                  (s) => s >= 0.6,
-                                  () => 'positive'
+                                  (s) => s > 0,
+                                  () => 'Positive'
                                 )
                                 .when(
-                                  (s) => s >= 0.4,
-                                  () => 'neutral'
+                                  (s) => s < 0,
+                                  () => 'Negative'
                                 )
-                                .otherwise(() => 'negative')}
+                                .otherwise(() => 'Neutral')}
                             </strong>{' '}
                             ({percentFormatter.format(item.sentiment)})
                           </span>
@@ -99,7 +99,7 @@ function Influencer() {
             <CartesianGrid strokeDasharray="3 3" horizontal={false} />
             <YAxis dataKey="name" type="category" width={110} tickMargin={10} />
             <XAxis type="number" tickFormatter={(value) => compactFormatter.format(value)} />
-            <Bar dataKey="mentions" fillOpacity={0.9} strokeWidth={1} radius={[0, 4, 4, 0]}>
+            <Bar dataKey="influence" fillOpacity={0.9} strokeWidth={1} radius={[0, 4, 4, 0]}>
               {
                 // Apply different colors based on sentiment
                 displayData.map((entry) => (

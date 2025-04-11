@@ -67,7 +67,6 @@ function SentimentBySources() {
           {/* Toggle button to switch between percentage and raw number views */}
           <Tooltip>
             <Toggle
-              className="absolute top-0 right-0 sm:static"
               variant="outline"
               pressed={variant === 'percent'}
               onPressedChange={(pressed) => setVariant(pressed ? 'percent' : 'number')}

@@ -17,6 +17,7 @@ const keyMetricsSchema = z.object({
     value: z.number(),
     percentChange: z.number(),
     trend: TrendEnum,
+    startDate: z.coerce.date(),
   }),
   averageRetweets: z.object({
     value: z.number(),
@@ -88,9 +89,9 @@ export async function loader(_args: LoaderFunctionArgs) {
       : import('~/mocks/synthetic_key_metrics.json').then((mod) => mod.default);
 
   const getTopics = () =>
-    // prefixUrl ?
-    // api.get('sentiment-reports/binance/topics').json().then(topicsSchema.parseAsync) :
-    import('~/mocks/synthetic_topics.json').then((mod) => mod.default);
+    prefixUrl
+      ? api.get('sentiment-reports/binance/topics').json().then(topicsSchema.parseAsync)
+      : import('~/mocks/synthetic_topics.json').then((mod) => mod.default);
 
   const getAccumulate = () =>
     prefixUrl
@@ -148,7 +149,7 @@ export default function SentimentReport() {
     <div
       className={cn(
         '@container/main flex flex-col gap-20 py-4 md:py-6 md:pb-32',
-        '**:data-section:mx-auto **:data-section:w-full **:data-section:max-w-5xl',
+        '**:data-section:mx-auto **:data-section:w-full **:data-section:max-w-5xl **:data-section:px-4',
         '**:data-desc:text-muted-foreground **:data-desc:mt-2 **:data-desc:max-w-2xl **:data-desc:text-sm/6'
         //
       )}
