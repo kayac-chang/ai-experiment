@@ -2,7 +2,7 @@ import { Outlet } from 'react-router';
 import { SidebarInset } from '~/components/ui/sidebar';
 import AppHeader from '~/components/app-header';
 import { ThemeToggle } from '~/root';
-import type { Route } from './+types/sidebar';
+import type { Route } from './+types/app-header';
 
 export { loader } from '~/layouts/loader';
 
