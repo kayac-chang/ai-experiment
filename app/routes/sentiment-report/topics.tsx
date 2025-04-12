@@ -35,7 +35,7 @@ function SentimentBar({
 }
 
 function Topics() {
-  const [viewType, setViewType] = useState<'percentage' | 'bar'>('percentage');
+  const [viewType, setViewType] = useState<'scalar' | 'percentage'>('scalar');
   const [sortBy, setSortBy] = useState<'topic' | 'positive' | 'negative' | 'neutral' | 'total'>(
     'topic'
   );
@@ -46,13 +46,13 @@ function Topics() {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
       setSortBy(column);
-      setSortDirection('asc');
+      setSortDirection('desc');
     }
   };
 
   const data = useSentimentTopicsData();
 
-  const sortedData = [...data['percent']].sort((a, b) =>
+  const sortedScalarData = data['raw'].sort((a, b) =>
     match({ sortBy, sortDirection })
       .with({ sortBy: 'topic', sortDirection: 'asc' }, () => a.topic.localeCompare(b.topic))
       .with({ sortBy: 'topic', sortDirection: 'desc' }, () => b.topic.localeCompare(a.topic))
@@ -69,6 +69,32 @@ function Topics() {
       )
       .otherwise(() => 0)
   );
+  console.log(sortBy);
+  console.log(sortDirection);
+  console.log(sortedScalarData);
+
+  const sortedPercentageData = data['percent'].sort((a, b) =>
+    match({ sortBy, sortDirection })
+      .with({ sortBy: 'topic', sortDirection: 'asc' }, () => a.topic.localeCompare(b.topic))
+      .with({ sortBy: 'topic', sortDirection: 'desc' }, () => b.topic.localeCompare(a.topic))
+      .with(
+        { sortBy: P.union('total', 'negative', 'positive', 'neutral'), sortDirection: 'asc' },
+        ({ sortBy }) => a[sortBy] - b[sortBy]
+      )
+      .with(
+        {
+          sortBy: P.union('total', 'negative', 'positive', 'neutral'),
+          sortDirection: 'desc',
+        },
+        ({ sortBy }) => b[sortBy] - a[sortBy]
+      )
+      .otherwise(() => 0)
+  );
+
+  const sortedData = match(viewType)
+    .with('scalar', () => sortedScalarData)
+    .with('percentage', () => sortedPercentageData)
+    .exhaustive();
 
   const direction = sortDirection === 'asc' ? '↑' : '↓';
 
@@ -89,31 +115,31 @@ function Topics() {
             value={viewType}
             onValueChange={(value) =>
               match(value)
-                .with('percentage', 'bar', setViewType)
+                .with('percentage', 'scalar', setViewType)
                 .otherwise(() => {})
             }
             variant="outline"
           >
+            <Tooltip>
+              <ToggleGroupItem value="scalar" asChild>
+                <TooltipTrigger>
+                  <BarChart3Icon />
+                </TooltipTrigger>
+              </ToggleGroupItem>
+              <TooltipContent>Scalar</TooltipContent>
+            </Tooltip>
             <Tooltip>
               <ToggleGroupItem value="percentage" asChild>
                 <TooltipTrigger>
                   <PieChartIcon />
                 </TooltipTrigger>
               </ToggleGroupItem>
-              <TooltipContent>Percentage View</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <ToggleGroupItem value="bar" asChild>
-                <TooltipTrigger>
-                  <BarChart3Icon />
-                </TooltipTrigger>
-              </ToggleGroupItem>
-              <TooltipContent>Bar View</TooltipContent>
+              <TooltipContent>Percentage</TooltipContent>
             </Tooltip>
           </ToggleGroup>
         </div>
 
-        <Table>
+        <Table className="table-auto">
           <TableHeader>
             <TableRow>
               <TableHead className="cursor-pointer" onClick={() => handleSort('topic')}>
@@ -148,58 +174,46 @@ function Topics() {
               <TableRow key={row.topic}>
                 <TableCell className="font-medium">{row.topic}</TableCell>
                 <TableCell className="text-right">
-                  {viewType === 'percentage' ? (
-                    <span className="text-[var(--chart-5)]">
-                      {percentFormatter.format(row.positive)}
-                    </span>
-                  ) : (
-                    <div className="bg-muted h-2.5 w-full rounded-full">
-                      <div
-                        className="h-2.5 rounded-full bg-[var(--chart-5)]"
-                        style={{ width: `${row.positive * 100}%` }}
-                      ></div>
-                    </div>
-                  )}
+                  <span className="text-[var(--chart-5)]">
+                    {match(viewType)
+                      .with('scalar', () => row.positive)
+                      .with('percentage', () => percentFormatter.format(row.positive))
+                      .exhaustive()}
+                  </span>
                 </TableCell>
                 <TableCell className="text-right">
-                  {viewType === 'percentage' ? (
-                    <span className="text-[var(--chart-2)]">
-                      {percentFormatter.format(row.negative)}
-                    </span>
-                  ) : (
-                    <div className="bg-muted h-2.5 w-full rounded-full">
-                      <div
-                        className="h-2.5 rounded-full bg-[var(--chart-2)]"
-                        style={{ width: `${row.negative * 100}%` }}
-                      ></div>
-                    </div>
-                  )}
+                  <span className="text-[var(--chart-2)]">
+                    {match(viewType)
+                      .with('scalar', () => row.negative)
+                      .with('percentage', () => percentFormatter.format(row.negative))
+                      .exhaustive()}
+                  </span>
                 </TableCell>
                 <TableCell className="text-right">
-                  {viewType === 'percentage' ? (
-                    <span className="text-[var(--chart-3)]">
-                      {percentFormatter.format(row.neutral)}
-                    </span>
-                  ) : (
-                    <div className="bg-muted h-2.5 w-full rounded-full">
-                      <div
-                        className="h-2.5 rounded-full bg-[var(--chart-3)]"
-                        style={{ width: `${row.neutral * 100}%` }}
-                      ></div>
-                    </div>
-                  )}
+                  <span className="text-[var(--chart-3)]">
+                    {match(viewType)
+                      .with('scalar', () => row.neutral)
+                      .with('percentage', () => percentFormatter.format(row.neutral))
+                      .exhaustive()}
+                  </span>
                 </TableCell>
                 <TableCell className="text-right">{row.total}</TableCell>
-                <TableCell>
+                <TableCell className="">
                   <div className="flex flex-wrap gap-1">
                     {row.positive_keywords.map((keyword) => (
-                      <Badge key={keyword} variant="outline" className="text-xs">
+                      <Badge
+                        key={keyword}
+                        className="dark:text-primary bg-[var(--chart-5)]/90 text-xs"
+                      >
                         {keyword}
                       </Badge>
                     ))}
 
                     {row.negative_keywords.map((keyword) => (
-                      <Badge key={keyword} variant="outline" className="text-xs">
+                      <Badge
+                        key={keyword}
+                        className="dark:text-primary bg-[var(--chart-2)]/90 text-xs"
+                      >
                         {keyword}
                       </Badge>
                     ))}
@@ -214,7 +228,7 @@ function Topics() {
           <CardTitle>Sentiment Distribution</CardTitle>
 
           <div className="mt-4 space-y-3">
-            {sortedData.map((row) => (
+            {sortedPercentageData.map((row) => (
               <div key={row.topic} className="space-y-1">
                 <div className="flex justify-between text-sm">
                   <span>{row.topic}</span>
