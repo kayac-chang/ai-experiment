@@ -5,6 +5,4 @@ export default [
     route('/', 'routes/sentiment-report/index.tsx'),
     //
   ]),
-
-  route('/theme', 'layouts/theme.ts'),
 ] satisfies RouteConfig;

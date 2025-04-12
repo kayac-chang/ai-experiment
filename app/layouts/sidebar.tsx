@@ -1,10 +1,7 @@
-import {
-  matchPath,
-  Outlet,
-  useFetcher,
-  useLoaderData,
-  type LoaderFunctionArgs,
-} from 'react-router';
+import { matchPath, Outlet, type LoaderFunctionArgs } from 'react-router';
+import { useHydrated } from 'remix-utils/use-hydrated';
+import { MoonIcon, SunIcon } from 'lucide-react';
+import { match } from 'ts-pattern';
 import { Separator } from '~/components/ui/separator';
 import {
   Sidebar,
@@ -16,11 +13,9 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '~/components/ui/sidebar';
-import type { Route } from './+types/sidebar';
 import { Switch } from '~/components/ui/switch';
-import { MoonIcon, SunIcon } from 'lucide-react';
-import userPrefsCookie from '~/user-prefs.server';
-import { match } from 'ts-pattern';
+import type { Route } from './+types/sidebar';
+import { useThemeContext } from '~/root';
 
 export async function loader(args: LoaderFunctionArgs) {
   const navs = [
@@ -32,22 +27,33 @@ export async function loader(args: LoaderFunctionArgs) {
 
   const url = new URL(args.request.url);
   const title = navs.find((nav) => matchPath(nav.url, url.pathname))?.title ?? '--';
-
-  const userPref = await userPrefsCookie.parse(args.request.headers.get('Cookie'));
-
-  return { title, navs, userPref };
+  return { title, navs };
 }
 
-export default function SidebarLayout({ loaderData }: Route.ComponentProps) {
-  const data = useLoaderData<typeof loader>();
-  const fetcher = useFetcher();
+function ThemeToggle() {
+  const isHydrated = useHydrated();
+  const { theme, toggleTheme } = useThemeContext();
 
-  const checked = match(data.userPref?.theme ?? 'light')
-    .with('light', () => false)
-    .with('dark', () => false)
-    .exhaustive();
-  const onCheckedChange = () => fetcher.submit(null, { action: '/theme', method: 'post' });
+  if (!isHydrated && !theme) {
+    return null;
+  }
 
+  return (
+    <Switch
+      className="ms-auto"
+      checked={match(theme)
+        .with('light', () => false)
+        .with('dark', () => true)
+        .otherwise(() => globalThis.matchMedia('(prefers-color-scheme: dark)').matches)}
+      onCheckedChange={toggleTheme}
+    >
+      <SunIcon className="group-data-[state=checked]:hidden" />
+      <MoonIcon className="group-data-[state=unchecked]:hidden" />
+    </Switch>
+  );
+}
+
+export default function SidebarLayout(props: Route.ComponentProps) {
   return (
     <SidebarProvider defaultOpen={false}>
       {/* AppSidebar */}
@@ -66,12 +72,9 @@ export default function SidebarLayout({ loaderData }: Route.ComponentProps) {
           <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
-            <h1 className="text-base font-medium">{loaderData.title}</h1>
+            <h1 className="text-base font-medium">{props.loaderData.title}</h1>
 
-            <Switch className="ms-auto" defaultChecked={checked} onCheckedChange={onCheckedChange}>
-              <SunIcon className="group-data-[state=checked]:hidden" />
-              <MoonIcon className="group-data-[state=unchecked]:hidden" />
-            </Switch>
+            <ThemeToggle />
           </div>
         </header>
 

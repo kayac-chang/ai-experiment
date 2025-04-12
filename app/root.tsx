@@ -1,19 +1,22 @@
+import './styles/app.css';
+
+import { match } from 'ts-pattern';
+import { useCallback, useEffect, useState } from 'react';
 import {
   isRouteErrorResponse,
+  Outlet,
+  useOutletContext,
+  createCookie,
   Links,
   Meta,
-  Outlet,
   Scripts,
   ScrollRestoration,
   useLoaderData,
-  type LoaderFunctionArgs,
 } from 'react-router';
-
+import { createTypedCookie } from 'remix-utils/typed-cookie';
+import { z } from 'zod';
+import { cn } from '~/lib/utils';
 import type { Route } from './+types/root';
-import './styles/app.css';
-import userPrefsServer from './user-prefs.server';
-import pProps from 'p-props';
-import { cn } from './lib/utils';
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -28,16 +31,58 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
-export function loader(args: LoaderFunctionArgs) {
-  return pProps({
-    userPref: userPrefsServer.parse(args.request.headers.get('Cookie')),
-  });
+const cookie = createCookie('theme', {
+  path: '/',
+  sameSite: 'lax',
+  secure: true,
+});
+
+const schema = z.enum(['light', 'dark']).nullish();
+const themeCookie = createTypedCookie({ cookie, schema });
+
+type ToggleContext = {
+  theme: 'light' | 'dark' | null | undefined;
+  toggleTheme: () => void;
+};
+
+export function useThemeContext() {
+  return useOutletContext<ToggleContext>();
 }
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export async function loader(args: Route.LoaderArgs) {
+  return themeCookie.parse(args.request.headers.get('Cookie'));
+}
+
+export default function App() {
   const data = useLoaderData<typeof loader>();
+  const [theme, setTheme] = useState(data);
+  const toggleTheme = useCallback(() => {
+    setTheme((theme) =>
+      match(theme)
+        .with('dark', () => 'light' as const)
+        .with('light', () => 'dark' as const)
+        .otherwise(() => {
+          return globalThis.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark';
+        })
+    );
+  }, []);
+
+  useEffect(() => {
+    if (theme) {
+      themeCookie.serialize(theme).then((cookie) => (document.cookie = cookie));
+      return;
+    }
+    if (globalThis.matchMedia('(prefers-color-scheme: dark)').matches) {
+      themeCookie.serialize('dark').then((cookie) => (document.cookie = cookie));
+      return;
+    } else {
+      themeCookie.serialize('light').then((cookie) => (document.cookie = cookie));
+      return;
+    }
+  }, [theme]);
+
   return (
-    <html lang="en" className={cn(data.userPref?.theme)}>
+    <html lang="en" className={cn(theme)}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -45,16 +90,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <Outlet context={{ theme, toggleTheme }} />
         <ScrollRestoration />
         <Scripts />
       </body>
     </html>
   );
-}
-
-export default function App() {
-  return <Outlet />;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
