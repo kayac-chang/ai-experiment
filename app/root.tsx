@@ -1,7 +1,7 @@
 import './styles/app.css';
 
 import { match } from 'ts-pattern';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type ComponentProps } from 'react';
 import {
   isRouteErrorResponse,
   Outlet,
@@ -14,9 +14,13 @@ import {
   useLoaderData,
 } from 'react-router';
 import { createTypedCookie } from 'remix-utils/typed-cookie';
+import { useHydrated } from 'remix-utils/use-hydrated';
 import { z } from 'zod';
-import { cn } from '~/lib/utils';
+
 import type { Route } from './+types/root';
+import { cn } from '~/lib/utils';
+import { Switch } from '~/components/ui/switch';
+import { MoonIcon, SunIcon } from 'lucide-react';
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -51,6 +55,29 @@ export function useThemeContext() {
 
 export async function loader(args: Route.LoaderArgs) {
   return themeCookie.parse(args.request.headers.get('Cookie'));
+}
+
+export function ThemeToggle(props: ComponentProps<typeof Switch>) {
+  const isHydrated = useHydrated();
+  const { theme, toggleTheme } = useThemeContext();
+
+  if (!isHydrated && !theme) {
+    return null;
+  }
+
+  return (
+    <Switch
+      checked={match(theme)
+        .with('light', () => false)
+        .with('dark', () => true)
+        .otherwise(() => globalThis.matchMedia('(prefers-color-scheme: dark)').matches)}
+      onCheckedChange={toggleTheme}
+      {...props}
+    >
+      <SunIcon className="group-data-[state=checked]:hidden" />
+      <MoonIcon className="group-data-[state=unchecked]:hidden" />
+    </Switch>
+  );
 }
 
 export default function App() {

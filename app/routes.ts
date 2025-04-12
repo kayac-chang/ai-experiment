@@ -1,7 +1,7 @@
 import { type RouteConfig, route, layout } from '@react-router/dev/routes';
 
 export default [
-  layout('layouts/sidebar.tsx', [
+  layout('layouts/app-header.tsx', [
     route('/', 'routes/sentiment-report/index.tsx'),
     //
   ]),
