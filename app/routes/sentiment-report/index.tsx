@@ -9,6 +9,18 @@ import { type LoaderFunctionArgs } from 'react-router';
 import pProps from 'p-props';
 import ky from 'ky';
 import { z } from 'zod';
+import dedent from 'dedent';
+import { generateText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '~/components/ui/accordion';
+import { useLoaderData } from 'react-router';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 
 const TrendEnum = z.enum(['up', 'down', 'neutral']);
 
@@ -79,6 +91,23 @@ const influencerSchema = z.array(
   })
 );
 
+const generateSummary = (text: string) =>
+  generateText({
+    model: openai('gpt-4o'),
+    system: dedent`
+      Analyze the provided data and generate a clear and concise summary.
+
+      # Steps
+      1. **Examine Data**: Thoroughly review the provided data to understand its structure, variables, and any patterns or trends.
+      2. **Extract Key Insights**: Identify the most significant or noteworthy information, including trends, correlations, anomalies, or any notable figures.
+      3. **Summarize**: Craft a concise summary that effectively communicates the key insights and overall findings from the data analysis.
+
+      # Output Format
+      - The summary should be presented in a short paragraph format, highlighting the major insights from the data.
+    `,
+    prompt: text,
+  }).then((res) => res.text);
+
 export async function loader(_args: LoaderFunctionArgs) {
   const prefixUrl = process.env.INTERNAL_API;
   const api = ky.create({ prefixUrl });
@@ -108,43 +137,161 @@ export async function loader(_args: LoaderFunctionArgs) {
       ? api.get('sentiment-reports/binance/records').json().then(recordsSchema.parseAsync)
       : import('~/mocks/synthetic_sentiment_xcom_april_2025.json').then((mod) => mod.default);
 
-  return pProps({
-    /**
-     * Key performance metrics related to sentiment analysis
-     * Includes metrics like total engagement, average sentiment scores, and trend indicators
-     * Each metric contains current value, percent change, and trend direction
-     */
-    sentiment_by_key_metries: getKeyMetrics(),
+  return (
+    pProps({
+      /**
+       * Key performance metrics related to sentiment analysis
+       * Includes metrics like total engagement, average sentiment scores, and trend indicators
+       * Each metric contains current value, percent change, and trend direction
+       */
+      sentiment_by_key_metries: getKeyMetrics(),
 
-    /**
-     * Sentiment data organized by topics
-     * Each topic includes positive, negative, neutral sentiment counts, total count,
-     * and a list of related keywords that define the topic
-     */
-    sentiment_by_topics: getTopics(),
+      /**
+       * Sentiment data organized by topics
+       * Each topic includes positive, negative, neutral sentiment counts, total count,
+       * and a list of related keywords that define the topic
+       */
+      sentiment_by_topics: getTopics()
+        // workaround
+        .then((data) =>
+          data
+            .sort((a, b) => b.total - a.total)
+            .slice(0, 10)
+            .map((item) => ({
+              ...item,
+              positive_keywords: item.positive_keywords.slice(0, 5),
+              negative_keywords: item.negative_keywords.slice(0, 5),
+            }))
+        ),
 
-    /**
-     * Sentiment data organized by trends over time
-     * The data includes temporal patterns and trend information for sentiment analysis
-     */
-    sentiment_by_trends: getRecords(),
+      /**
+       * Sentiment data organized by trends over time
+       * The data includes temporal patterns and trend information for sentiment analysis
+       */
+      sentiment_by_trends: getRecords(),
 
-    /**
-     * Sample data representing sentiment counts across different social media platforms
-     * Each object contains the source name and counts for positive, negative, and neutral sentiments
-     */
-    sentiment_by_sources: getAccumulate(),
+      /**
+       * Sample data representing sentiment counts across different social media platforms
+       * Each object contains the source name and counts for positive, negative, and neutral sentiments
+       */
+      sentiment_by_sources: getAccumulate(),
 
-    /**
-     * Sentiment data organized by key influencers
-     * Each influencer entry includes their name, reach metrics, and sentiment impact scores
-     * Used to identify individuals with significant influence on overall sentiment
-     */
-    sentiment_by_influencer: getInfluencer(),
-  });
+      /**
+       * Sentiment data organized by key influencers
+       * Each influencer entry includes their name, reach metrics, and sentiment impact scores
+       * Used to identify individuals with significant influence on overall sentiment
+       */
+      sentiment_by_influencer: getInfluencer().then((data) =>
+        data.sort((a, b) => b.influence - a.influence).slice(0, 10)
+      ),
+    })
+      //
+      .then(async (results) => {
+        const summaries = await pProps({
+          sentiment_by_key_metries: generateSummary(dedent`
+            ## Key Metrics
+            Displays essential statistics such as sentiment score averages, total tweet volume, and engagement levels.
+            These figures offer a quick snapshot of performance and public reaction.
+
+            ## Data Input
+            '''
+            ${JSON.stringify(results.sentiment_by_key_metries)}
+            '''
+          `),
+          sentiment_by_sources: generateSummary(dedent`
+            ## Sentiment by Sources
+            Analyzes sentiment distribution across different data sources and platforms.
+            Provides insights into how sentiment varies by platform and source type.
+
+            ## Data Input
+            '''
+            ${JSON.stringify(results.sentiment_by_sources)}
+            '''
+          `),
+          sentiment_by_trends: generateSummary(dedent`
+            ## Sentiment Trends
+            Tracks sentiment changes over time, identifying patterns and significant shifts.
+            Helps understand the temporal evolution of public sentiment.
+
+            ## Data Input
+            '''
+            ${JSON.stringify(results.sentiment_by_trends)}
+            '''
+          `),
+          sentiment_by_topics: generateSummary(dedent`
+            ## Topics Analysis
+            Identifies key discussion topics and their associated sentiment patterns.
+            Highlights what subjects are driving public conversation and emotional responses.
+
+            ## Data Input
+            '''
+            ${JSON.stringify(results.sentiment_by_topics)}
+            '''
+          `),
+          sentiment_by_influencer: generateSummary(dedent`
+            ## Influencer Impact
+            Evaluates the influence and sentiment impact of key individuals or accounts.
+            Identifies who is shaping the conversation and their overall sentiment contribution.
+
+            ## Data Input
+            '''
+            ${JSON.stringify(results.sentiment_by_influencer)}
+            '''
+          `),
+        });
+
+        // Generate comprehensive summary
+        const comprehensiveSummary = await generateText({
+          model: openai('gpt-4o'),
+          system: dedent`
+              Provide a high-level overview that synthesizes insights from all sections of the report.
+              Focus on the most significant findings and their implications.
+
+              # Output Format
+              - The summary should be presented in a short paragraph format, highlighting the major insights from the data.
+          `,
+          prompt: dedent`
+              ## Key Metrics Summary
+              '''
+              ${summaries.sentiment_by_key_metries}
+              '''
+
+              ## Sentiment Distribution Summary
+              '''
+              ${summaries.sentiment_by_sources}
+              '''
+
+              ## Trend Analysis Summary
+              '''
+              ${summaries.sentiment_by_trends}
+              '''
+
+              ## Topics Analysis Summary
+              '''
+              ${summaries.sentiment_by_topics}
+              '''
+
+              ## Influencer Impact Summary
+              '''
+              ${summaries.sentiment_by_influencer}
+              '''
+          `,
+        }).then((res) => res.text);
+
+        return {
+          ...results,
+          summaries: {
+            ...summaries,
+            comprehensive: comprehensiveSummary,
+          },
+        };
+      })
+  );
 }
 
 export default function SentimentReport() {
+  const { summaries } = useLoaderData<typeof loader>();
+
   return (
     <div
       className={cn(
@@ -164,6 +311,10 @@ export default function SentimentReport() {
         <p data-desc>
           Provides a high-level summary of the sentiment data collected from the sources.
         </p>
+        <blockquote className="mt-4">
+          <strong>AI Summary</strong>
+          <p>{summaries.comprehensive}</p>
+        </blockquote>
       </section>
 
       {/* key metrics */}
@@ -174,6 +325,18 @@ export default function SentimentReport() {
           engagement levels. These figures offer a quick snapshot of performance and public
           reaction.
         </p>
+        <div className="mt-4">
+          <Accordion type="single" collapsible>
+            <AccordionItem value="key-metrics-summary">
+              <AccordionTrigger className="w-fit">AI Insights</AccordionTrigger>
+              <AccordionContent>
+                <p className="text-muted-foreground text-sm">
+                  {summaries.sentiment_by_key_metries}
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
 
         <div className="mt-8">
           <KeyMetrics />
@@ -190,11 +353,55 @@ export default function SentimentReport() {
         </p>
 
         <div className="mt-8">
-          <SentimentBySources />
+          <Card className="relative">
+            <CardHeader>
+              <CardTitle>Sentiment By Sources</CardTitle>
+              <CardDescription data-desc className="mt-2">
+                Compares sentiment trends across different social media platforms, such as Twitter,
+                Reddit, or Facebook. Reveals how sentiment varies depending on the data source.
+              </CardDescription>
+
+              <Accordion type="single" collapsible>
+                <AccordionItem value="sources-summary">
+                  <AccordionTrigger className="w-fit">AI Insights</AccordionTrigger>
+                  <AccordionContent>
+                    <p className="text-muted-foreground text-sm">
+                      {summaries.sentiment_by_sources}
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </CardHeader>
+
+            <CardContent>
+              <SentimentBySources />
+            </CardContent>
+          </Card>
         </div>
 
         <div className="mt-8">
-          <SentimentTrends />
+          <Card>
+            <CardHeader>
+              <CardTitle>Sentiment Trends Across Platforms</CardTitle>
+              <CardDescription data-desc className="mt-2">
+                Tracks how sentiment changes over time across X.com, Reddit, and TikTok to identify
+                patterns, spikes, or shifts in public opinion. Useful for comparing reactions to
+                specific events or campaigns across different social media platforms.
+              </CardDescription>
+
+              <Accordion type="single" collapsible>
+                <AccordionItem value="trends-summary">
+                  <AccordionTrigger className="w-fit">AI Insights</AccordionTrigger>
+                  <AccordionContent>
+                    <p className="text-muted-foreground text-sm">{summaries.sentiment_by_trends}</p>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </CardHeader>
+            <CardContent>
+              <SentimentTrends />
+            </CardContent>
+          </Card>
         </div>
       </section>
 
@@ -207,7 +414,28 @@ export default function SentimentReport() {
         </p>
 
         <div className="mt-8">
-          <Topics />
+          <Card>
+            <CardHeader>
+              <CardTitle>Sentiment by Topics</CardTitle>
+              <CardDescription data-desc className="mt-2">
+                Analyzes sentiment distribution across different topics or themes mentioned in
+                social media conversations. This helps identify which topics generate positive,
+                negative, or neutral reactions.
+              </CardDescription>
+
+              <Accordion type="single" collapsible>
+                <AccordionItem value="topics-summary">
+                  <AccordionTrigger className="w-fit">AI Insights</AccordionTrigger>
+                  <AccordionContent>
+                    <p className="text-muted-foreground text-sm">{summaries.sentiment_by_topics}</p>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </CardHeader>
+            <CardContent>
+              <Topics />
+            </CardContent>
+          </Card>
         </div>
       </section>
 
@@ -220,7 +448,30 @@ export default function SentimentReport() {
         </p>
 
         <div className="mt-8">
-          <Influencer />
+          <Card>
+            <CardHeader>
+              <CardTitle>Top Influencers by Mentions</CardTitle>
+              <CardDescription data-desc className="mt-2">
+                Shows the most mentioned influencers across social media platforms, with bars
+                colored by sentiment. Green indicates positive sentiment, blue indicates neutral,
+                and red indicates negative sentiment.
+              </CardDescription>
+
+              <Accordion type="single" collapsible>
+                <AccordionItem value="influencer-summary">
+                  <AccordionTrigger className="w-fit">AI Insights</AccordionTrigger>
+                  <AccordionContent>
+                    <p className="text-muted-foreground text-sm">
+                      {summaries.sentiment_by_influencer}
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </CardHeader>
+            <CardContent>
+              <Influencer />
+            </CardContent>
+          </Card>
         </div>
       </section>
     </div>

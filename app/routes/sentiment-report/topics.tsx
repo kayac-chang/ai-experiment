@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { match, P } from 'ts-pattern';
 import { BarChart3Icon, PieChartIcon } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
+import { CardTitle } from '~/components/ui/card';
 import {
   Table,
   TableBody,
@@ -96,151 +96,128 @@ function Topics() {
   const direction = sortDirection === 'asc' ? '↑' : '↓';
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Sentiment by Topics</CardTitle>
-        <CardDescription data-desc className="mt-2">
-          Analyzes sentiment distribution across different topics or themes mentioned in social
-          media conversations. This helps identify which topics generate positive, negative, or
-          neutral reactions.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="mb-4 flex justify-end">
-          <ToggleGroup
-            type="single"
-            value={viewType}
-            onValueChange={(value) =>
-              match(value)
-                .with('percentage', 'scalar', setViewType)
-                .otherwise(() => {})
-            }
-            variant="outline"
-          >
-            <Tooltip>
-              <ToggleGroupItem value="scalar" asChild>
-                <TooltipTrigger>
-                  <BarChart3Icon />
-                </TooltipTrigger>
-              </ToggleGroupItem>
-              <TooltipContent>Scalar</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <ToggleGroupItem value="percentage" asChild>
-                <TooltipTrigger>
-                  <PieChartIcon />
-                </TooltipTrigger>
-              </ToggleGroupItem>
-              <TooltipContent>Percentage</TooltipContent>
-            </Tooltip>
-          </ToggleGroup>
-        </div>
+    <>
+      <div className="mb-4 flex justify-end">
+        <ToggleGroup
+          type="single"
+          value={viewType}
+          onValueChange={(value) =>
+            match(value)
+              .with('percentage', 'scalar', setViewType)
+              .otherwise(() => {})
+          }
+          variant="outline"
+        >
+          <Tooltip>
+            <ToggleGroupItem value="scalar" asChild>
+              <TooltipTrigger>
+                <BarChart3Icon />
+              </TooltipTrigger>
+            </ToggleGroupItem>
+            <TooltipContent>Scalar</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <ToggleGroupItem value="percentage" asChild>
+              <TooltipTrigger>
+                <PieChartIcon />
+              </TooltipTrigger>
+            </ToggleGroupItem>
+            <TooltipContent>Percentage</TooltipContent>
+          </Tooltip>
+        </ToggleGroup>
+      </div>
 
-        <Table className="table-auto">
-          <TableHeader>
-            <TableRow>
-              <TableHead className="cursor-pointer" onClick={() => handleSort('topic')}>
-                Topic {sortBy === 'topic' && direction}
-              </TableHead>
-              <TableHead
-                className="cursor-pointer text-right"
-                onClick={() => handleSort('positive')}
-              >
-                Positive {sortBy === 'positive' && direction}
-              </TableHead>
-              <TableHead
-                className="cursor-pointer text-right"
-                onClick={() => handleSort('negative')}
-              >
-                Negative {sortBy === 'negative' && direction}
-              </TableHead>
-              <TableHead
-                className="cursor-pointer text-right"
-                onClick={() => handleSort('neutral')}
-              >
-                Neutral {sortBy === 'neutral' && direction}
-              </TableHead>
-              <TableHead className="cursor-pointer text-right" onClick={() => handleSort('total')}>
-                Total {sortBy === 'total' && direction}
-              </TableHead>
-              <TableHead>Keywords</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sortedData.map((row) => (
-              <TableRow key={row.topic}>
-                <TableCell className="font-medium">{row.topic}</TableCell>
-                <TableCell className="text-right">
-                  <span className="text-[var(--chart-5)]">
-                    {match(viewType)
-                      .with('scalar', () => row.positive)
-                      .with('percentage', () => percentFormatter.format(row.positive))
-                      .exhaustive()}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <span className="text-[var(--chart-2)]">
-                    {match(viewType)
-                      .with('scalar', () => row.negative)
-                      .with('percentage', () => percentFormatter.format(row.negative))
-                      .exhaustive()}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <span className="text-[var(--chart-3)]">
-                    {match(viewType)
-                      .with('scalar', () => row.neutral)
-                      .with('percentage', () => percentFormatter.format(row.neutral))
-                      .exhaustive()}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">{row.total}</TableCell>
-                <TableCell className="">
-                  <div className="flex flex-wrap gap-1">
-                    {row.positive_keywords.map((keyword) => (
-                      <Badge
-                        key={keyword}
-                        className="dark:text-primary bg-[var(--chart-5)]/90 text-xs"
-                      >
-                        {keyword}
-                      </Badge>
-                    ))}
+      <Table className="table-auto">
+        <TableHeader>
+          <TableRow>
+            <TableHead className="cursor-pointer" onClick={() => handleSort('topic')}>
+              Topic {sortBy === 'topic' && direction}
+            </TableHead>
+            <TableHead className="cursor-pointer text-right" onClick={() => handleSort('positive')}>
+              Positive {sortBy === 'positive' && direction}
+            </TableHead>
+            <TableHead className="cursor-pointer text-right" onClick={() => handleSort('negative')}>
+              Negative {sortBy === 'negative' && direction}
+            </TableHead>
+            <TableHead className="cursor-pointer text-right" onClick={() => handleSort('neutral')}>
+              Neutral {sortBy === 'neutral' && direction}
+            </TableHead>
+            <TableHead className="cursor-pointer text-right" onClick={() => handleSort('total')}>
+              Total {sortBy === 'total' && direction}
+            </TableHead>
+            <TableHead>Keywords</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {sortedData.map((row) => (
+            <TableRow key={row.topic}>
+              <TableCell className="font-medium">{row.topic}</TableCell>
+              <TableCell className="text-right">
+                <span className="text-[var(--chart-5)]">
+                  {match(viewType)
+                    .with('scalar', () => row.positive)
+                    .with('percentage', () => percentFormatter.format(row.positive))
+                    .exhaustive()}
+                </span>
+              </TableCell>
+              <TableCell className="text-right">
+                <span className="text-[var(--chart-2)]">
+                  {match(viewType)
+                    .with('scalar', () => row.negative)
+                    .with('percentage', () => percentFormatter.format(row.negative))
+                    .exhaustive()}
+                </span>
+              </TableCell>
+              <TableCell className="text-right">
+                <span className="text-[var(--chart-3)]">
+                  {match(viewType)
+                    .with('scalar', () => row.neutral)
+                    .with('percentage', () => percentFormatter.format(row.neutral))
+                    .exhaustive()}
+                </span>
+              </TableCell>
+              <TableCell className="text-right">{row.total}</TableCell>
+              <TableCell className="">
+                <div className="flex flex-wrap gap-1">
+                  {row.positive_keywords.map((keyword) => (
+                    <Badge
+                      key={keyword}
+                      className="dark:text-primary bg-[var(--chart-5)]/90 text-xs"
+                    >
+                      {keyword}
+                    </Badge>
+                  ))}
 
-                    {row.negative_keywords.map((keyword) => (
-                      <Badge
-                        key={keyword}
-                        className="dark:text-primary bg-[var(--chart-2)]/90 text-xs"
-                      >
-                        {keyword}
-                      </Badge>
-                    ))}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-
-        <div className="mt-8">
-          <CardTitle>Sentiment Distribution</CardTitle>
-
-          <div className="mt-4 space-y-3">
-            {sortedPercentageData.map((row) => (
-              <div key={row.topic} className="space-y-1">
-                <div className="flex justify-between text-sm">
-                  <span>{row.topic}</span>
+                  {row.negative_keywords.map((keyword) => (
+                    <Badge
+                      key={keyword}
+                      className="dark:text-primary bg-[var(--chart-2)]/90 text-xs"
+                    >
+                      {keyword}
+                    </Badge>
+                  ))}
                 </div>
-                <SentimentBar
-                  positive={row.positive}
-                  negative={row.negative}
-                  neutral={row.neutral}
-                />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      <div className="mt-8">
+        <CardTitle>Sentiment Distribution</CardTitle>
+
+        <div className="mt-4 space-y-3">
+          {sortedPercentageData.map((row) => (
+            <div key={row.topic} className="space-y-1">
+              <div className="flex justify-between text-sm">
+                <span>{row.topic}</span>
               </div>
-            ))}
-          </div>
+              <SentimentBar positive={row.positive} negative={row.negative} neutral={row.neutral} />
+            </div>
+          ))}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </>
   );
 }
 

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { format } from 'date-fns/format';
 import { ChartArea, ChartLine } from 'lucide-react';
 import { CartesianGrid, Line, LineChart, Area, AreaChart, XAxis, YAxis } from 'recharts';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 import {
   ChartContainer,
   ChartLegend,
@@ -91,45 +90,35 @@ function SentimentTrends() {
   const [chartType, setChartType] = useState<'line' | 'area'>('line');
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Sentiment Trends Across Platforms</CardTitle>
-        <CardDescription data-desc className="mt-2">
-          Tracks how sentiment changes over time across X.com, Reddit, and TikTok to identify
-          patterns, spikes, or shifts in public opinion. Useful for comparing reactions to specific
-          events or campaigns across different social media platforms.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex justify-end">
-          <ToggleGroup
-            type="single"
-            value={chartType}
-            onValueChange={(value) => value && setChartType(value as 'line' | 'area')}
-            variant="outline"
-          >
-            <Tooltip>
-              <ToggleGroupItem value="line" asChild>
-                <TooltipTrigger>
-                  <ChartLine />
-                </TooltipTrigger>
-              </ToggleGroupItem>
-              <TooltipContent>Line Chart</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <ToggleGroupItem value="area" asChild>
-                <TooltipTrigger>
-                  <ChartArea />
-                </TooltipTrigger>
-              </ToggleGroupItem>
-              <TooltipContent>Area Chart</TooltipContent>
-            </Tooltip>
-          </ToggleGroup>
-        </div>
+    <>
+      <div className="flex justify-end">
+        <ToggleGroup
+          type="single"
+          value={chartType}
+          onValueChange={(value) => value && setChartType(value as 'line' | 'area')}
+          variant="outline"
+        >
+          <Tooltip>
+            <ToggleGroupItem value="line" asChild>
+              <TooltipTrigger>
+                <ChartLine />
+              </TooltipTrigger>
+            </ToggleGroupItem>
+            <TooltipContent>Line Chart</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <ToggleGroupItem value="area" asChild>
+              <TooltipTrigger>
+                <ChartArea />
+              </TooltipTrigger>
+            </ToggleGroupItem>
+            <TooltipContent>Area Chart</TooltipContent>
+          </Tooltip>
+        </ToggleGroup>
+      </div>
 
-        {chartType === 'line' ? <SentimentTrendsLine /> : <SentimentTrendsArea />}
-      </CardContent>
-    </Card>
+      {chartType === 'line' ? <SentimentTrendsLine /> : <SentimentTrendsArea />}
+    </>
   );
 }
 export default SentimentTrends;

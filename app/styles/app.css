@@ -211,7 +211,7 @@
   p {
     @apply leading-7;
   }
-  blackquote {
+  blockquote {
     @apply border-l-2 pl-6 italic;
   }
   code {
