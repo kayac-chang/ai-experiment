@@ -69,9 +69,6 @@ function Topics() {
       )
       .otherwise(() => 0)
   );
-  console.log(sortBy);
-  console.log(sortDirection);
-  console.log(sortedScalarData);
 
   const sortedPercentageData = data['percent'].sort((a, b) =>
     match({ sortBy, sortDirection })

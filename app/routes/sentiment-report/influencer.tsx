@@ -38,8 +38,7 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 function Influencer() {
-  const data = useSentimentInfluencerData();
-  const displayData = [...data].sort((a, b) => b.influence - a.influence).slice(0, 10);
+  const displayData = useSentimentInfluencerData();
 
   return (
     <Card>

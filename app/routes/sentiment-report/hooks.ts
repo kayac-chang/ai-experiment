@@ -77,7 +77,7 @@ export function useSentimentTopicsData() {
 export function useSentimentInfluencerData() {
   const data = useLoaderData<typeof loader>();
 
-  return data.sentiment_by_influencer;
+  return data.sentiment_by_influencer.sort((a, b) => b.influence - a.influence).slice(0, 10);
 }
 
 /**
